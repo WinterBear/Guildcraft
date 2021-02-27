@@ -1,0 +1,8 @@
+.idea/libraries/*
+.idea/workspace.xml
+*/libs/*.jar
+.idea/*
+target/*
+*/surefire-reports/*
+*.ipr
+*.iws

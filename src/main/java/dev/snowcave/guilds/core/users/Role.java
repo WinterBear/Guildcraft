@@ -1,0 +1,49 @@
+package dev.snowcave.guilds.core.users;
+
+import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.core.users.permissions.Permissions;
+
+import java.security.acl.Permission;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by WinterBear on 19/12/2020.
+ */
+public class Role {
+
+    private String title;
+
+    private List<GuildPermission> permissions;
+
+    public Role(){
+
+    }
+
+
+    public Role(String title) {
+        this.title = title;
+        this.permissions = new ArrayList<>();
+    }
+
+    public Role withPermission(GuildPermission permission){
+        this.permissions.add(permission);
+        return this;
+    }
+
+    public List<GuildPermission> getPermissions(){
+        return permissions;
+    }
+
+    public void setPermissions(List<GuildPermission> permissions){
+        this.permissions = permissions;
+    }
+
+    public String getTitle(){
+        return title;
+    }
+
+    public void setTitle(String title){
+        this.title = title;
+    }
+}
