@@ -31,6 +31,11 @@ public class GuildCreationCommandHandler implements GuildCommandHandler {
         if(Guilds.getGuild(player).isPresent()){
             handleExistingGuild(player);
         } else {
+            if(arguments.length < 2){
+                ChatUtils.send(player, "&7Usage&8: &b/guild create &e<&6Guild Name&e> &8- &7Create a new Guild");
+                ChatUtils.send(player, "&7You need 500 Lia to purchase a guild. Earn money with contracts or shops.");
+                return;
+            }
             if(EconomyUtils.ECONOMY.has(player, Prices.BASE_GUILD_COST)){
                 EconomyUtils.ECONOMY.withdrawPlayer(player, Prices.BASE_GUILD_COST);
                 String guildName = String.join(" ", Arrays.copyOfRange(arguments, 1, arguments.length));

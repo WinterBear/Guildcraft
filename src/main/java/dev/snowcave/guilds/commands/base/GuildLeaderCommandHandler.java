@@ -16,7 +16,7 @@ public abstract class GuildLeaderCommandHandler implements GuildCommandHandler {
 
     public void handle(Player player, String[] arguments){
         Optional<User> user = Guilds.getUser(player);
-        if(user.isPresent() && user.get().getGuild().getLeader().equals(user.get())){
+        if(user.isPresent() && user.get().getGuild().getLeader().getUuid().equals(user.get().getUuid())){
             handle(player, user.get(), arguments);
         } else {
             ChatUtils.send(player, "&7You are not the leader of a guild.");

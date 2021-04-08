@@ -20,7 +20,7 @@ public class GuildLeaveCommandHandler extends GuildMemberCommandHandler {
     @Override
     public void handle(Player player, User user, String[] arguments) {
         Guild guild = user.getGuild();
-        if(guild.getLeader() == user && guild.getMembers().size() > 1){
+        if(guild.getLeader().getUuid().equals(user.getUuid()) && guild.getMembers().size() > 1){
             User scion = guild.getMembers().stream()
                     .filter(u -> !u.equals(user)) //Don't pick the current leader as the new one
                     .filter(u -> u.hasPermission(GuildPermission.INHERIT)).findAny() //Find heirs if any are present

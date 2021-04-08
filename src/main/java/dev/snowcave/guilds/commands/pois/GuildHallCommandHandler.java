@@ -2,15 +2,19 @@ package dev.snowcave.guilds.commands.pois;
 
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionBonusCommandHandler;
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
+import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.guildhalls.GuildHallShape;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.ChunkUtils;
+import dev.snowcave.guilds.utils.LocationUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by WinterBear on 22/12/2020.
@@ -21,7 +25,7 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
     public void handleWithPermissionAndBonus(Player player, User user, String[] arguments) {
         if(arguments.length == 1){
             ChatUtils.send(player, "&3" + user.getGuild().getGuildHall().getName());
-            ChatUtils.send(player, "&3Location&7: &e" + user.getGuild().getGuildHall().getCenter());
+            ChatUtils.send(player, "&3Location&7: &e" + LocationUtils.toDisplayString(user.getGuild().getGuildHall().getCenter()));
             ChatUtils.send(player, "&3Size&7: &b" + user.getGuild().getGuildHall().getSize());
             ChatUtils.send(player, "&3Shape&7: &b" + user.getGuild().getGuildHall().getShape());
             ChatUtils.send(player, "&3Available Commands&7:");
@@ -47,8 +51,13 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
     }
 
     private void handleMove(Player player, User user){
-        user.getGuild().getGuildHall().setCenter(player.getLocation());
-        ChatUtils.send(player, "&3Moved Guild Hall to your current location.");
+        Optional<Guild> guildAtLocation = ChunkUtils.getGuild(player.getLocation().getChunk());
+        if(guildAtLocation.isPresent() && user.getGuild().equals(guildAtLocation.get())) {
+            user.getGuild().getGuildHall().setCenter(player.getLocation());
+            ChatUtils.send(player, "&3Moved Guild Hall to your current location.");
+        } else {
+            ChatUtils.send(player, "&7Error - Location is not within your Guilds territory.");
+        }
     }
 
     private void handleName(Player player, User user, String newName){
@@ -80,8 +89,6 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
 
     @Override
     public String describe() {
-        return "&b/g hall move &8- &7Move your Guild Hall to your current location.\n" +
-                "&b/g hall name &e<&6New Name&e> &8- &7Rename your Guild Hall.\n" +
-                "&b/g hall shape &e<&aCircle&8/&cSquare&e> &8- &7Change the shape of your Guild Hall's area of effect.";
+        return "&b/guild hall &8- &7View and edit Guild Hall options.";
     }
 }

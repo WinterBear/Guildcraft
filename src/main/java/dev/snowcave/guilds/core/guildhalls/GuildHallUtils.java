@@ -13,6 +13,15 @@ public class GuildHallUtils {
         guildHall.setShape(GuildHallShape.CIRCLE);
         guildHall.setSize(GuildHallSize.SMALL);
         guildHall.setGuild(guild);
+        guildHall.setName(guild.getGuildName() + " Guild Hall");
         guild.setGuildHall(guildHall);
+    }
+
+    public static void increaseHallSize1(Guild guild){
+        guild.getGuildHall().setSize(GuildHallSize.MEDIUM);
+    }
+
+    public static void increaseHallSize2(Guild guild){
+        guild.getGuildHall().setSize(GuildHallSize.LARGE);
     }
 }

@@ -1,5 +1,10 @@
 package dev.snowcave.guilds.core.users.permissions;
 
+import dev.snowcave.guilds.core.Guild;
+
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * Created by WinterBear on 19/12/2020.
  */
@@ -25,6 +30,12 @@ public enum GuildPermission {
     GuildPermission(String name, String description){
         this.displayName = name;
         this.description = description;
+    }
+
+    public static Optional<GuildPermission> get(String name){
+        return Arrays.stream(GuildPermission.values())
+                .filter(g -> g.getDisplayName().equalsIgnoreCase(name))
+                .findFirst();
     }
 
     public String getDisplayName() {
