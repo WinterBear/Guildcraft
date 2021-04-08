@@ -18,6 +18,10 @@ public class GuildViewLevelCommandHandler extends GuildMemberCommandHandler {
 
     @Override
     public void handle(Player player, User user, String[] arguments) {
+        if(arguments.length < 2){
+            ChatUtils.send(player, describe());
+            return;
+        }
         int maxLevel = Levels.LEVELS.size();
         try {
             int level = Integer.parseInt(arguments[1]);

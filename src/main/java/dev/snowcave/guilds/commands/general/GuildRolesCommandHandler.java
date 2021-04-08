@@ -21,6 +21,18 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
+        if(arguments.length == 1){
+            ChatUtils.send(player, "&b/g roles list &8- &7List guild roles\n"
+                    + "&b/g roles create &e<&6Role Name&e> &8- &7Create a new role\n"
+                    + "&b/g roles rename &e<&6Role&e> &7- &e<&6New Name&e> &8- &7Rename a role\n"
+                    + "&b/g roles copy &e<&6From Role&e> &7- &e<&6To Role&e> &8- &7Copy permissions from one role to another\n"
+                    + "&b/g roles remove &e<&6Role Name&e> &8- &7Remove a role\n"
+                    + "&b/g roles addperm &e<&6Role Name&e> &7- &e<&6Permission&e> &8- &7Add a permission to a role\n"
+                    + "&b/g roles removeperm &e<&6Role Name&e> &7- &e<&6Permission&e> &8- &7Remove a permission from a role\n"
+                    + "&b/g roles permissions &8- &7List permissions\n"
+                    + "&b/g roles assign &e<&6Player&e> &e<&6Role Name&e> &8- &7Assign a role to a member of your Guild");
+            return;
+        }
         if(arguments[1].equalsIgnoreCase("list")){
             listRoles(player, user);
         } else if (arguments[1].equalsIgnoreCase("create")){
@@ -93,6 +105,9 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
             } else {
                 ChatUtils.send(player,"&7Usage&8: &b/g roles assign &e<&6Player&e> &e<&6Role Name&e>");
             }
+        } else if (arguments[1].equalsIgnoreCase("permissions") || arguments[1].equalsIgnoreCase("perms")){
+            ChatUtils.send(player, "&7Available Permissions: ");
+            Arrays.stream(GuildPermission.values()).forEach(p -> ChatUtils.send(player, "&6" + p.getDisplayName() + "&b: &3" + p.getDescription()));
         }
 
     }
@@ -109,13 +124,7 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
 
     @Override
     public String describe() {
-        return "&b/g roles create &e<&6Role Name&e>\n"
-                + "&b/g roles rename &e<&6Role&e> &7- &e<&6New Name&e>\n"
-                + "&b/g roles copy &e<&6From Role&e> &7- &e<&6To Role&e>\n"
-                + "&b/g roles remove &e<&6Role Name&e>\n"
-                + "&b/g roles addperm &e<&6Role Name&e> &7- &e<&6Permission&e>\n"
-                + "&b/g roles removeperm &e<&6Role Name&e> &7- &e<&6Permission&e>\n"
-                + "&b/g roles assign &e<&6Player&e> &e<&6Role Name&e>";
+        return "&b/guild roles &8- &7Edit guild roles";
     }
 
     //View Roles
@@ -127,7 +136,7 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
 
         for(Role role : orderedRoles){
             List<String> users = user.getGuild().getMembers().stream()
-                    .filter(u -> u.getRole().equals(role))
+                    .filter(u -> u.getRole().get().equals(role))
                     .map(User::getName)
                     .collect(Collectors.toList());
             List<String> permissions = role.getPermissions().stream()
@@ -280,6 +289,9 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
         if(role.isPresent()){
             String oldName = role.get().getTitle();
             role.get().setTitle(newName);
+            user.getGuild().getMembers().stream()
+                    .filter(m -> m.getRoleReference().equalsIgnoreCase(oldName))
+                    .forEach(m -> m.setRoleReference(newName));
             ChatUtils.send(player, "&7Renamed the role &6" + oldName + " &7to &e" + newName);
         } else {
             ChatUtils.send(player, "&7The role &b" + roleName + " &7does not appear to exist.");

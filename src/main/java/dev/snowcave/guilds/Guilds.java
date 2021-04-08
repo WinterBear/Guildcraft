@@ -4,10 +4,7 @@ import dev.snowcave.guilds.commands.GuildCommand;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.data.StorageController;
 import dev.snowcave.guilds.core.users.User;
-import dev.snowcave.guilds.interaction.GuildHallInteractionListener;
-import dev.snowcave.guilds.interaction.MonsterWard;
-import dev.snowcave.guilds.interaction.PlayerInteractionListener;
-import dev.snowcave.guilds.interaction.ProtectionListener;
+import dev.snowcave.guilds.interaction.*;
 import dev.snowcave.guilds.utils.EconomyUtils;
 import io.github.winterbear.WinterCoreUtils.CommandRegistry;
 import io.github.winterbear.wintercore.Annotations.SpigotPlugin;
@@ -61,9 +58,12 @@ public class Guilds extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new PlayerInteractionListener(), this);
         this.getServer().getPluginManager().registerEvents(new ProtectionListener(), this);
         this.getServer().getPluginManager().registerEvents(new GuildHallInteractionListener(), this);
+        this.getServer().getPluginManager().registerEvents(new GuildStoreListener(), this);
         EconomyUtils.setupEconomy();
         MonsterWard.start(this);
+        GuildHallInteractionListener.start(this);
         StorageController.load(this);
+        StorageController.start(this);
     }
 
     @Override

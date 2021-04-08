@@ -22,6 +22,8 @@ public class GuildHall {
 
     private String name;
 
+    private int foodStore;
+
     @JsonIgnore
     private Guild guild;
 
@@ -39,26 +41,27 @@ public class GuildHall {
 
     @JsonIgnore
     private double getSquareMaxX(){
-        return this.center.getX() + (size.getSquareRadius());
+        return this.getCenter().getX() + (size.getSquareRadius());
     }
 
     @JsonIgnore
     private double getSquareMinX(){
-        return this.center.getX() - (size.getSquareRadius());
+        return this.getCenter().getX() - (size.getSquareRadius());
     }
 
     @JsonIgnore
     private double getSquareMaxZ(){
-        return this.center.getZ() + (size.getSquareRadius());
+        return this.getCenter().getZ() + (size.getSquareRadius());
     }
 
     @JsonIgnore
     private double getSquareMinZ(){
-        return this.center.getZ() - (size.getSquareRadius());
+        return this.getCenter().getZ() - (size.getSquareRadius());
     }
 
     public void setCenter(Location center) {
         this.center = center;
+        this.centerString = center.getWorld().getName() + "|" + center.getX() + "|" + center.getY() + "|" + center.getZ();
     }
 
     public void setSize(GuildHallSize size) {
@@ -109,5 +112,15 @@ public class GuildHall {
         this.centerString = centerString;
     }
 
+    public int getFoodStore() {
+        return foodStore;
+    }
 
+    public void addFood(int amount){
+        foodStore += amount;
+    }
+
+    public void setFoodStore(int foodStore) {
+        this.foodStore = foodStore;
+    }
 }

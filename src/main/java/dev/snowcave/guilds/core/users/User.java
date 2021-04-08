@@ -62,7 +62,7 @@ public class User {
     }
 
     public boolean hasPermission(GuildPermission permission){
-        if(guild.getLeader().equals(this)){
+        if(guild.getLeader().getUuid().equals(this.getUuid())){
             return true;
         }
         if(getRole().isPresent()){
