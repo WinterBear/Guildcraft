@@ -14,6 +14,7 @@ import dev.snowcave.guilds.commands.options.GuildOptionsCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildHallCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildMoveSpawnCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildSpawnCommandHandler;
+import dev.snowcave.guilds.commands.pois.GuildStoresCommandHandler;
 import dev.snowcave.guilds.core.guildhalls.GuildHall;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import io.github.winterbear.WinterCoreUtils.CommandSenderUtils;
@@ -42,6 +43,7 @@ public class GuildCommand implements CommandExecutor {
             new GuildOptionsCommandHandler(),
             new GuildLevelCommandHandler(),
             new GuildViewLevelCommandHandler(),
+            new GuildRolesCommandHandler(),
 
             //Joining & Leaving
             new GuildJoinCommandHandler(),
@@ -57,6 +59,7 @@ public class GuildCommand implements CommandExecutor {
             new GuildSpawnCommandHandler(),
             new GuildMoveSpawnCommandHandler(),
             new GuildHallCommandHandler(),
+            new GuildStoresCommandHandler(),
 
             //Misc
             new GuildTopCommandHandler(),

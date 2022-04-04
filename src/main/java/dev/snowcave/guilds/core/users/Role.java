@@ -26,13 +26,17 @@ public class Role {
         this.permissions = new ArrayList<>();
     }
 
-    public Role withPermission(GuildPermission permission){
+    public Role addPermission(GuildPermission permission){
         this.permissions.add(permission);
         return this;
     }
 
     public List<GuildPermission> getPermissions(){
         return permissions;
+    }
+
+    public void removePermission(GuildPermission permission){
+        this.permissions.remove(permission);
     }
 
     public void setPermissions(List<GuildPermission> permissions){

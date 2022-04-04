@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.Guild;
+import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,17 +28,21 @@ public class StorageController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static void save(JavaPlugin plugin){
+    public static void start(JavaPlugin plugin){
+        RepeatingTaskUtils.everyMinutes(20, () -> StorageController.save(plugin), plugin);
+    }
+
+    public static boolean save(JavaPlugin plugin){
         ObjectWriter ow = MAPPER.writer().withDefaultPrettyPrinter();
         Path path = Paths.get(plugin.getDataFolder()+ "/guilds/");
-        Path backup = Paths.get(plugin.getDataFolder()+ "/guilds/backups/");
+        Path backup = Paths.get(plugin.getDataFolder()+ "/backups/");
         try {
             Files.createDirectories(path);
             Files.createDirectories(backup);
 
             String backupTimestamp = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 
-            Path todayBackup = Paths.get(plugin.getDataFolder()+ "/guilds/backups/" + backupTimestamp);
+            Path todayBackup = Paths.get(plugin.getDataFolder()+ "/backups/" + backupTimestamp);
 
             if(!Files.exists(todayBackup)){
                 Files.createDirectories(todayBackup);
@@ -56,6 +61,7 @@ public class StorageController {
             ChatUtils.error("There was an unexpected error creating the Guilds directory: ");
             e.printStackTrace();
         }
+        return true;
     }
 
     private static void saveGuild(Guild guild, ObjectWriter ow, String path){
@@ -69,8 +75,10 @@ public class StorageController {
     }
 
     public static void backup(Path backupDir, Path filePath){
+        ChatUtils.info("Backing up " + filePath + " to " + backupDir);
         try {
-            Files.move(filePath, backupDir);
+            Path destination = Paths.get(backupDir.toString(), filePath.getFileName().toString());
+            Files.move(filePath, destination);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,7 +90,7 @@ public class StorageController {
             Path path = Paths.get(plugin.getDataFolder()+ "/guilds/");
             Files.createDirectories(path);
             Files.list(Paths.get(plugin.getDataFolder() + "/guilds/"))
-            .forEach(StorageController::loadGuild);
+                    .forEach(StorageController::loadGuild);
 
         } catch (IOException e) {
             ChatUtils.error("There was an unexpected error loading guilds:");
@@ -92,7 +100,7 @@ public class StorageController {
 
     private static void loadGuild(Path filePath){
 
-
+        ChatUtils.info("Loading Guild " + filePath);
         try {
             String json = Files.lines(filePath).collect(Collectors.joining());
             Guild guild = MAPPER.readValue(json, Guild.class);

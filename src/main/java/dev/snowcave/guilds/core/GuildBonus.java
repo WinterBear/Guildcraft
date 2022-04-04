@@ -23,8 +23,8 @@ public enum GuildBonus {
     BOOST_MIRROR_ATTUNEMENT("Writ of Hidden Mirrors","Grants bonus drops within the Mirror world on Sundays"),
     BOOST_FOOD("Writ of Culinary Refinement","Grants bonus Guild Feast stock when depositing food."),
     LIVESTOCK_AURA("Livestock Ward","A mysterious ward protects all livestock within the guild from damage by non-guild members."),
-    GUILD_HALL_RADIUS_1("Guild Hall Upgrade 1","Upgrades the maximum size of your Guild Hall"),
-    GUILD_HALL_RADIUS_2("Guild Hall Upgrade 2","Upgrades the maximum size of your Guild Hall"),
+    GUILD_HALL_RADIUS_1("Guild Hall Upgrade 1","Upgrades the maximum size of your Guild Hall", GuildHallUtils::increaseHallSize1),
+    GUILD_HALL_RADIUS_2("Guild Hall Upgrade 2","Upgrades the maximum size of your Guild Hall", GuildHallUtils::increaseHallSize2),
     GUILD_HALL_RADIUS_3("Guild Hall Upgrade 3","Upgrades the maximum size of your Guild Hall"),
     GUILD_HALL_AMBIENT_MUSIC("Ambient Music","Select music that will play within your Guild Hall"),
     NPC_REPAIR("NPC: Blacksmith","Summon a Blacksmith NPC who will repair items for a price."),
@@ -70,6 +70,6 @@ public enum GuildBonus {
 
     @Override
     public String toString() {
-        return ChatColor.of("#52a8ff") + displayName + " &8- &e" + description;
+        return ChatColor.of("#52a8ff") + displayName + " &8- &e" + description + "&8";
     }
 }

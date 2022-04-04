@@ -13,34 +13,34 @@ import java.util.List;
 public class DefaultRoles {
 
     public static final Role GRAND_MASTER = new Role("Grandmaster")
-            .withPermission(GuildPermission.CLAIM)
-            .withPermission(GuildPermission.INVITE)
-            .withPermission(GuildPermission.KICK)
-            .withPermission(GuildPermission.OPTIONS)
-            .withPermission(GuildPermission.ALLIANCE)
-            .withPermission(GuildPermission.LEVELUP)
-            .withPermission(GuildPermission.WITHDRAW)
-            .withPermission(GuildPermission.DEPOSIT)
-            .withPermission(GuildPermission.INHERIT)
-            .withPermission(GuildPermission.MOVE_SPAWN)
-            .withPermission(GuildPermission.GUILDHALL);
+            .addPermission(GuildPermission.CLAIM)
+            .addPermission(GuildPermission.INVITE)
+            .addPermission(GuildPermission.KICK)
+            .addPermission(GuildPermission.OPTIONS)
+            .addPermission(GuildPermission.ALLIANCE)
+            .addPermission(GuildPermission.LEVELUP)
+            .addPermission(GuildPermission.WITHDRAW)
+            .addPermission(GuildPermission.DEPOSIT)
+            .addPermission(GuildPermission.INHERIT)
+            .addPermission(GuildPermission.MOVE_SPAWN)
+            .addPermission(GuildPermission.GUILDHALL);
 
     public static final Role MASTER = new Role("Master")
-            .withPermission(GuildPermission.CLAIM)
-            .withPermission(GuildPermission.INVITE)
-            .withPermission(GuildPermission.KICK)
-            .withPermission(GuildPermission.LEVELUP)
-            .withPermission(GuildPermission.WITHDRAW)
-            .withPermission(GuildPermission.DEPOSIT)
-            .withPermission(GuildPermission.INHERIT);
+            .addPermission(GuildPermission.CLAIM)
+            .addPermission(GuildPermission.INVITE)
+            .addPermission(GuildPermission.KICK)
+            .addPermission(GuildPermission.LEVELUP)
+            .addPermission(GuildPermission.WITHDRAW)
+            .addPermission(GuildPermission.DEPOSIT)
+            .addPermission(GuildPermission.INHERIT);
 
     public static final Role ACOLYTE = new Role("Acolyte")
-            .withPermission(GuildPermission.INVITE)
-            .withPermission(GuildPermission.KICK)
-            .withPermission(GuildPermission.DEPOSIT);
+            .addPermission(GuildPermission.INVITE)
+            .addPermission(GuildPermission.KICK)
+            .addPermission(GuildPermission.DEPOSIT);
 
     public static final Role MEMBER = new Role("Member")
-            .withPermission(GuildPermission.DEPOSIT);
+            .addPermission(GuildPermission.DEPOSIT);
 
 
     private static final List<Role> CORE_ROLES = Arrays.asList(
