@@ -7,7 +7,7 @@ import dev.snowcave.guilds.core.Guild;
  */
 public class GuildHallUtils {
 
-    public static void setupGuildHall(Guild guild){
+    public static void setupGuildHall(Guild guild) {
         GuildHall guildHall = new GuildHall();
         guildHall.setCenter(guild.getSpawnLocation());
         guildHall.setShape(GuildHallShape.CIRCLE);
@@ -17,11 +17,11 @@ public class GuildHallUtils {
         guild.setGuildHall(guildHall);
     }
 
-    public static void increaseHallSize1(Guild guild){
+    public static void increaseHallSize1(Guild guild) {
         guild.getGuildHall().setSize(GuildHallSize.MEDIUM);
     }
 
-    public static void increaseHallSize2(Guild guild){
+    public static void increaseHallSize2(Guild guild) {
         guild.getGuildHall().setSize(GuildHallSize.LARGE);
     }
 }

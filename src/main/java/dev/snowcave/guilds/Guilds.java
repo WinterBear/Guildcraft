@@ -5,11 +5,9 @@ import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.data.StorageController;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.interaction.*;
+import dev.snowcave.guilds.map.MapRenderer;
 import dev.snowcave.guilds.utils.EconomyUtils;
-import io.github.winterbear.WinterCoreUtils.CommandRegistry;
 import io.github.winterbear.wintercore.Annotations.SpigotPlugin;
-import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,23 +24,26 @@ public class Guilds extends JavaPlugin {
 
     public static final List<Guild> GUILDS = new ArrayList<>();
 
-    public static Optional<Guild> getGuild(String guild){
-        return GUILDS.stream().filter(g -> g.getGuildName().equalsIgnoreCase(guild)).findFirst();
+    public static Optional<Guild> getGuild(String guild) {
+        return GUILDS.stream()
+                .filter(g -> g.getGuildName().equalsIgnoreCase(guild)
+                        || g.getGuildOptions().getGuildTag().equalsIgnoreCase(guild))
+                .findFirst();
     }
 
-    public static Optional<Guild> getGuild(Player player){
-        for(Guild guild : GUILDS){
-            if(guild.hasMember(player)){
+    public static Optional<Guild> getGuild(Player player) {
+        for (Guild guild : GUILDS) {
+            if (guild.hasMember(player)) {
                 return Optional.of(guild);
             }
         }
         return Optional.empty();
     }
 
-    public static Optional<User> getUser(Player player){
-        if(player != null){
-            for(Guild guild : GUILDS){
-                if(guild.hasMember(player)){
+    public static Optional<User> getUser(Player player) {
+        if (player != null) {
+            for (Guild guild : GUILDS) {
+                if (guild.hasMember(player)) {
                     return Optional.of(guild.getMember(player)).get();
                 }
             }
@@ -64,10 +65,13 @@ public class Guilds extends JavaPlugin {
         GuildHallInteractionListener.start(this);
         StorageController.load(this);
         StorageController.start(this);
+
+        MapRenderer.enable();
+        GUILDS.forEach(g -> MapRenderer.renderGuild(String.valueOf(g.hashCode()), g));
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         StorageController.save(this);
     }
 }

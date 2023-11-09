@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 /**
  * Created by WinterBear on 26/12/2020.
  */
-public class NoticeboardOptionHandler implements GuildOptionHandler{
+public class NoticeboardOptionHandler implements GuildOptionHandler {
 
     @Override
     public String getKeyword() {

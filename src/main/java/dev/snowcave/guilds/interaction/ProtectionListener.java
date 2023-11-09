@@ -7,9 +7,7 @@ import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.utils.ChunkUtils;
 import dev.snowcave.guilds.utils.EntityTypeUtils;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -26,7 +24,6 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.*;
 
 /**
@@ -40,6 +37,7 @@ public class ProtectionListener implements Listener {
     //TODO - Redstone - how?
 
     private static final List<Material> CONTAINERS = Arrays.asList(Material.CHEST,
+            Material.BARREL,
             Material.ENDER_CHEST,
             Material.BREWING_STAND,
             Material.HOPPER,
@@ -106,16 +104,20 @@ public class ProtectionListener implements Listener {
             Material.WARPED_PRESSURE_PLATE
     );
 
+    private boolean playerHasOverride(Player player) {
+        return player.hasPermission("guilds.admin");
+    }
+
     @EventHandler
-    public void onEntityInteract(PlayerInteractEntityEvent event){
-        if(event.getRightClicked() instanceof ItemFrame
+    public void onEntityInteract(PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof ItemFrame
                 || event.getRightClicked() instanceof ArmorStand
                 || event.getRightClicked() instanceof Lectern
                 || event.getRightClicked() instanceof Minecart
                 || event.getRightClicked() instanceof Chest) {
             Optional<Guild> playerGuild = Guilds.getGuild(event.getPlayer());
             Optional<Guild> chunkGuild = ChunkUtils.getGuild(event.getPlayer().getLocation().getChunk());
-            if(chunkGuild.isPresent() && !chunkGuild.equals(playerGuild)){
+            if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer())) {
                 event.setCancelled(true);
             }
         }
@@ -126,10 +128,10 @@ public class ProtectionListener implements Listener {
         Player player = event.getPlayer();
         Optional<Guild> playerGuild = Guilds.getGuild(player);
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(player.getLocation().getChunk());
-        if(chunkGuild.isPresent() && !chunkGuild.equals(playerGuild)){
-            if(event.getAction().equals(Action.PHYSICAL) && event.getClickedBlock() != null){
+        if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer())) {
+            if (event.getAction().equals(Action.PHYSICAL) && event.getClickedBlock() != null) {
                 Material mat = event.getClickedBlock().getType();
-                if(CONTAINERS.contains(mat) || TOGGLEABLE.contains(mat) || PLATES.contains(mat)) {
+                if (CONTAINERS.contains(mat) || TOGGLEABLE.contains(mat) || PLATES.contains(mat)) {
                     event.setCancelled(true);
                     event.setUseInteractedBlock(Event.Result.DENY);
                 }
@@ -139,22 +141,22 @@ public class ProtectionListener implements Listener {
 
     //Combat Block
     @EventHandler
-    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent entityEvent){
-        if(EntityTypeUtils.entityIsPlayer(entityEvent.getEntity())){
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent entityEvent) {
+        if (EntityTypeUtils.entityIsPlayer(entityEvent.getEntity())) {
             Optional<Guild> victimGuild = Guilds.getGuild((Player) entityEvent.getEntity());
             Optional<Guild> attackerGuild;
             boolean attackerIsPlayer = EntityTypeUtils.entityIsPlayer(entityEvent.getDamager());
-            if(attackerIsPlayer){
+            if (attackerIsPlayer) {
                 attackerGuild = Guilds.getGuild((Player) entityEvent.getDamager());
             } else {
                 attackerGuild = Optional.empty();
             }
             Chunk chunkVictim = entityEvent.getEntity().getLocation().getChunk();
             Optional<Guild> chunkGuild = ChunkUtils.getGuild(chunkVictim);
-            if(chunkGuild.isPresent()){ //If the victim was damaged within a guild area
-                if(attackerIsPlayer //If attacker is player
+            if (chunkGuild.isPresent()) { //If the victim was damaged within a guild area
+                if (attackerIsPlayer //If attacker is player
                         && victimGuild.equals(chunkGuild) //And the victim was a member of the same guild
-                        && !attackerGuild.equals(chunkGuild)){ //And the attacker is not a member of of the same guild
+                        && !attackerGuild.equals(chunkGuild)) { //And the attacker is not a member of of the same guild
                     entityEvent.setCancelled(true);
                 }
                 if (!attackerIsPlayer //If attacker is mob
@@ -175,6 +177,7 @@ public class ProtectionListener implements Listener {
     //    }
     //}
 
+    //What does this even do?
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockFromTo(BlockFromToEvent event) {
         Optional<Guild> toGuild = ChunkUtils.getGuild(event.getToBlock().getChunk());
@@ -185,18 +188,18 @@ public class ProtectionListener implements Listener {
     }
 
     @EventHandler
-    public void onEntityExplode(EntityExplodeEvent event){
+    public void onEntityExplode(EntityExplodeEvent event) {
         handleExplosion(event.getLocation().getChunk(), event, event.blockList());
     }
 
     @EventHandler
-    public void onBlockExplode(BlockExplodeEvent event){
+    public void onBlockExplode(BlockExplodeEvent event) {
         handleExplosion(event.getBlock().getChunk(), event, event.blockList());
     }
 
-    private void handleExplosion(Chunk chunk, Cancellable event, List<Block> blocks){
+    private void handleExplosion(Chunk chunk, Cancellable event, List<Block> blocks) {
         Optional<Guild> guild = ChunkUtils.getGuild(chunk);
-        if(guild.isPresent() && !guild.get().getGuildOptions().isExplosionsEnabled()){
+        if (guild.isPresent() && !guild.get().getGuildOptions().isExplosionsEnabled()) {
             event.setCancelled(true);
             return;
         }
@@ -204,45 +207,41 @@ public class ProtectionListener implements Listener {
         List<Block> blocksCopy = new ArrayList<>(blocks);
         for (Block block : blocksCopy) {
             Optional<Guild> blockGuild = ChunkUtils.getGuild(block.getChunk());
-            if(blockGuild.isPresent()
-                    && (!blockGuild.get().getGuildOptions().isExplosionsEnabled() || !explosionInGuild)){
+            if (blockGuild.isPresent()
+                    && (!blockGuild.get().getGuildOptions().isExplosionsEnabled() || !explosionInGuild)) {
                 blocks.remove(block);
             }
         }
     }
 
 
-
-
-
     @EventHandler
-    public void onExplosionDamage(EntityDamageByEntityEvent e){
-        if(e.getEntity() instanceof Player &&
+    public void onExplosionDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Player &&
                 EXPLOSIONS.contains(e.getCause())) {
             Player p = (Player) e.getEntity();
             Optional<Guild> entityGuild = ChunkUtils.getGuild(p.getLocation().getChunk());
             Optional<Guild> explosionGuild = ChunkUtils.getGuild(e.getEntity().getLocation().getChunk());
-            if(entityGuild.isPresent() && !explosionGuild.isPresent()){
+            if (entityGuild.isPresent() && !explosionGuild.isPresent()) {
                 e.setCancelled(true);
             }
         }
     }
 
 
-
     @EventHandler
-    public void onPistonEvent(BlockPistonExtendEvent e){
-        if(!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()){
-            if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())){
+    public void onPistonEvent(BlockPistonExtendEvent e) {
+        if (!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()) {
+            if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())) {
                 e.setCancelled(true);
             }
         }
     }
 
     @EventHandler
-    public void onPistonEvent(BlockPistonRetractEvent e){
-        if(!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()){
-            if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())){
+    public void onPistonEvent(BlockPistonRetractEvent e) {
+        if (!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()) {
+            if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())) {
                 e.setCancelled(true);
             }
         }
@@ -251,11 +250,11 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(event.getBlock().getChunk());
-        if(chunkGuild.isPresent()){
+        if (chunkGuild.isPresent()) {
             Optional<User> user = Guilds.getUser(event.getPlayer());
-            if(user.isPresent()){
+            if (user.isPresent()) {
                 Guild userGuild = user.get().getGuild();
-                if(!userGuild.equals(chunkGuild.get())){
+                if (!userGuild.equals(chunkGuild.get()) && !playerHasOverride(event.getPlayer())) {
                     event.setCancelled(true);
                 }
             } else {
@@ -267,11 +266,11 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(event.getBlock().getChunk());
-        if(chunkGuild.isPresent()){
+        if (chunkGuild.isPresent() && !playerHasOverride(event.getPlayer())) {
             Optional<User> user = Guilds.getUser(event.getPlayer());
-            if(user.isPresent()){
+            if (user.isPresent()) {
                 Guild userGuild = user.get().getGuild();
-                if(!userGuild.equals(chunkGuild.get())){
+                if (!userGuild.equals(chunkGuild.get())) {
                     event.setCancelled(true);
                 }
             } else {

@@ -2,8 +2,8 @@ package dev.snowcave.guilds.core;
 
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.config.DefaultRoles;
-import org.bukkit.entity.Player;
 import dev.snowcave.guilds.core.users.User;
+import org.bukkit.entity.Player;
 
 /**
  * Created by WinterBear on 19/12/2020.
@@ -11,8 +11,7 @@ import dev.snowcave.guilds.core.users.User;
 public class GuildCreator {
 
 
-
-    public static Guild create(String guildName, Player player){
+    public static Guild create(String guildName, Player player) {
         User grandMaster = new User(player.getName(), player.getUniqueId(), DefaultRoles.GRAND_MASTER);
 
         Guild guild = new Guild(guildName, grandMaster);

@@ -17,7 +17,7 @@ public class GuildDepositCommandHandler extends GuildMemberPermissionCommandHand
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
-        if(arguments.length > 1) {
+        if (arguments.length > 1) {
             try {
                 double amount = Double.parseDouble(arguments[1]);
                 if (EconomyUtils.ECONOMY.has(player, amount)) {

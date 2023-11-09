@@ -23,19 +23,19 @@ public class LevelConfBuilder {
 
     private Double cost;
 
-    private LevelConfBuilder(int maxMembers, int maxChunks){
+    private LevelConfBuilder(int maxMembers, int maxChunks) {
         this.maxChunks = maxChunks;
         this.maxMembers = maxMembers;
         this.guildBonuses = new ArrayList<>();
         this.cost = 0.0;
     }
 
-    public static LevelConfBuilder start(int maxMembers, int maxChunks){
+    public static LevelConfBuilder start(int maxMembers, int maxChunks) {
         return new LevelConfBuilder(maxMembers, maxChunks);
     }
 
-    public LevelConfBuilder nextLevel(int maxChunks, int maxMembers, Double cost){
-        levels.add(new Level(currentLevel, this.maxChunks, this.maxMembers, guildBonuses, this.cost));
+    public LevelConfBuilder nextLevel(int maxChunks, int maxMembers, Double cost) {
+        levels.add(new Level(currentLevel, this.maxMembers, this.maxChunks, guildBonuses, this.cost));
         this.currentLevel++;
         this.maxChunks = maxChunks;
         this.maxMembers = maxMembers;
@@ -44,16 +44,15 @@ public class LevelConfBuilder {
         return this;
     }
 
-    public LevelConfBuilder withBonus(GuildBonus bonus){
+    public LevelConfBuilder withBonus(GuildBonus bonus) {
         guildBonuses.add(bonus);
         return this;
     }
 
-    public List<Level> build(){
-        levels.add(new Level(currentLevel, maxChunks, maxMembers, guildBonuses, cost));
+    public List<Level> build() {
+        levels.add(new Level(currentLevel, maxMembers, maxChunks, guildBonuses, cost));
         return this.levels;
     }
-
 
 
 }

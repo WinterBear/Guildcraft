@@ -4,8 +4,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by WinterBear on 22/12/2020.
@@ -21,6 +19,7 @@ public class EntityTypeUtils {
             EntityType.BLAZE,
             EntityType.CAVE_SPIDER,
             EntityType.DROWNED,
+            EntityType.PHANTOM,
             EntityType.SPIDER,
             EntityType.EVOKER,
             EntityType.HUSK,
@@ -42,7 +41,6 @@ public class EntityTypeUtils {
     public static boolean entityIsPlayer(Entity entity) {
         return entity.getType().equals(EntityType.PLAYER);
     }
-
 
 
 }

@@ -1,24 +1,23 @@
 package dev.snowcave.guilds.commands.pois;
 
 import dev.snowcave.guilds.commands.base.GuildMemberBonusCommandHandler;
-import dev.snowcave.guilds.commands.base.GuildMemberPermissionBonusCommandHandler;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.interaction.GuildStoreListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by WinterBear on 01/01/2021.
  */
 public class GuildStoresCommandHandler extends GuildMemberBonusCommandHandler {
 
-    private Inventory openInventory(Player player, int rows, String displayName){
-        Inventory inventory = Bukkit.createInventory(player, rows*9, displayName);
+    private Inventory openInventory(Player player, int rows, String displayName) {
+        Inventory inventory = Bukkit.createInventory(player, rows * 9, displayName);
         player.openInventory(inventory);
         GuildStoreListener.OPEN_STORES.add(player.getUniqueId());
         return inventory;

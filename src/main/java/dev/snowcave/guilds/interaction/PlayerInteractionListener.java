@@ -1,6 +1,5 @@
 package dev.snowcave.guilds.interaction;
 
-import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.utils.ChunkUtils;
 import dev.snowcave.guilds.utils.EntityTypeUtils;
@@ -30,18 +29,25 @@ public class PlayerInteractionListener implements Listener {
 
     //Explore
     @EventHandler
-    public void PlayerMove(PlayerMoveEvent event){
-        if(event.getTo() != null) {
+    public void PlayerMove(PlayerMoveEvent event) {
+        if (event.getTo() != null) {
             Player player = event.getPlayer();
             Chunk fromChunk = event.getFrom().getChunk();
             Chunk toChunk = event.getTo().getChunk();
             if (fromChunk != toChunk) {
                 Optional<Guild> toGuild = ChunkUtils.getGuild(toChunk);
                 Optional<Guild> fromGuild = ChunkUtils.getGuild(fromChunk);
+
                 if (toGuild.isPresent()) {
+
                     if (!fromGuild.isPresent() || !fromGuild.get().equals(toGuild.get())) {
-                        //Send message - moved from Guild A to Guild B
-                        player.sendTitle(ChatUtils.format("&fﾟ･&8-&f･ &3" + ChatColor.of(toGuild.get().getGuildOptions().getColor())  + toGuild.get().getGuildOptions().getGuildSymbol().getSymbol() + " &f･&8-&f･ﾟ"), ChatUtils.format("&6" + toGuild.get().getGuildName()), 12, 18, 12);
+                        Optional<String> outpost = ChunkUtils.getChunkOutpost(toGuild.get(), toChunk);
+                        if (!outpost.isPresent()) {
+                            sentGuildWelcomeTitle(toGuild.get(), player);
+                        } else {
+                            sentGuildOutpostWelcomeTitle(toGuild.get(), player, outpost.get());
+                        }
+
                     }
                 } else if (fromGuild.isPresent()) {
                     player.sendTitle(ChatUtils.format("&fﾟ･&8-&f･ &a✦ &f･&8-&f･ﾟ"), ChatUtils.format("&2Wilderness"), 12, 18, 12);
@@ -50,14 +56,26 @@ public class PlayerInteractionListener implements Listener {
         }
     }
 
+    private void sentGuildWelcomeTitle(Guild guild, Player player) {
+        ChatColor guildColor = ChatColor.of(guild.getGuildOptions().getColor());
+        String guildSymbol = guild.getGuildOptions().getGuildSymbol().getSymbol();
+        player.sendTitle(ChatUtils.format("&fﾟ･&8-&f･ &3" + guildColor + guildSymbol + " &f･&8-&f･ﾟ"), guildColor + guild.getGuildName(), 12, 18, 12);
+    }
+
+    private void sentGuildOutpostWelcomeTitle(Guild guild, Player player, String outpost) {
+        ChatColor guildColor = ChatColor.of(guild.getGuildOptions().getColor());
+        String guildSymbol = guild.getGuildOptions().getGuildSymbol().getSymbol();
+        player.sendTitle(ChatUtils.format("&fﾟ･&8-&f･ &3" + guildColor + guildSymbol + " &f･&8-&f･ﾟ"), guildColor + guild.getGuildName() + ChatUtils.format(" &f- ") + outpost, 12, 18, 12);
+    }
+
     //PVP Block
     @EventHandler
-    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent entityEvent){
-        if(EntityTypeUtils.entityIsPlayer(entityEvent.getDamager())
-            && EntityTypeUtils.entityIsPlayer(entityEvent.getEntity())){
+    public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent entityEvent) {
+        if (EntityTypeUtils.entityIsPlayer(entityEvent.getDamager())
+                && EntityTypeUtils.entityIsPlayer(entityEvent.getEntity())) {
             Chunk chunk = entityEvent.getEntity().getLocation().getChunk();
-            if(ChunkUtils.getGuild(chunk).isPresent()
-                && !ChunkUtils.getGuild(chunk).get().getGuildOptions().isPvpEnabled()){
+            if (ChunkUtils.getGuild(chunk).isPresent()
+                    && !ChunkUtils.getGuild(chunk).get().getGuildOptions().isPvpEnabled()) {
                 entityEvent.setCancelled(true);
             }
         }

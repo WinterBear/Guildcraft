@@ -1,7 +1,5 @@
 package dev.snowcave.guilds.core;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-
 /**
  * Created by WinterBear on 22/12/2020.
  */
@@ -53,7 +51,7 @@ public class GuildOptions {
         this.color = "#5e9cff";
     }
 
-    private String generateGuildTag(String guildName){
+    private String generateGuildTag(String guildName) {
         String[] split = guildName.split(" ");
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < split.length; i++) {

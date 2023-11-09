@@ -1,5 +1,6 @@
 package dev.snowcave.guilds.commands.invites;
 
+import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
 import dev.snowcave.guilds.config.DefaultRoles;
 import dev.snowcave.guilds.core.Guild;
@@ -24,13 +25,17 @@ public class GuildInviteCommandHandler extends GuildMemberPermissionCommandHandl
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
-        if(arguments.length < 2){
+        if (arguments.length < 2) {
             ChatUtils.send(player, ChatUtils.format("&b/guild invite &e<&6Player&e> &8- &7Invite a player to join your Guild."));
         } else {
             OfflinePlayer invitePlayer = Bukkit.getOfflinePlayer(arguments[1]);
             Guild guild = user.getGuild();
-            if(guild.getLevel().getMaxMembers() > guild.getMembers().size()){
-                if(invitePlayer.hasPlayedBefore()) {
+            if (guild.getLevel().getMaxMembers() > guild.getMembers().size()) {
+                if (invitePlayer.isOnline() || invitePlayer.hasPlayedBefore()) {
+                    if (Guilds.getGuild(invitePlayer.getPlayer()).isPresent()) {
+                        ChatUtils.send(player, ChatUtils.format("&3That player is already part of a Guild."));
+                        return;
+                    }
                     INVITES.add(new Invite(guild, new User(invitePlayer.getName(), invitePlayer.getUniqueId(), DefaultRoles.MEMBER)));
                     ChatUtils.send(player, ChatUtils.format("&3Sent invite to &6" + invitePlayer.getName()));
                     if (invitePlayer.isOnline()) {

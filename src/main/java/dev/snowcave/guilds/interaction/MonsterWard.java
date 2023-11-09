@@ -20,28 +20,31 @@ import java.util.Arrays;
  */
 public class MonsterWard {
 
-    public static void start(JavaPlugin plugin){
+    public static void start(JavaPlugin plugin) {
         RepeatingTaskUtils.everyTick(10, MonsterWard::wardMobs, plugin);
     }
 
-    public static boolean wardMobs(){
+    public static boolean wardMobs() {
         Guilds.GUILDS.forEach(MonsterWard::wardMobs);
         return true;
     }
 
-    public static void wardMobs(Guild guild){
-        if(Levels.getAllGuildBonuses(guild.getLevel()).contains(GuildBonus.MONSTER_WARD)){
-            for(ChunkReference chunkReference : guild.getChunks().getChunkReferences()){
+    public static void wardMobs(Guild guild) {
+        if (Levels.getAllGuildBonuses(guild.getLevel()).contains(GuildBonus.MONSTER_WARD)) {
+            for (ChunkReference chunkReference : guild.allChunks()) {
                 World world = Bukkit.getServer().getWorld(chunkReference.getWorldRef());
-                if(world != null){
+                if (world != null) {
                     Chunk chunk = world.getChunkAt(chunkReference.getX(), chunkReference.getZ());
-                    Arrays.stream(chunk.getEntities()).filter(e -> EntityTypeUtils.HOSTILE_ENTITIES.contains(e.getType()))
-                            .forEach(Entity::remove);
+                    if (chunk.isLoaded()) {
+                        Arrays.stream(chunk.getEntities())
+                                .filter(e -> EntityTypeUtils.HOSTILE_ENTITIES.contains(e.getType()))
+                                .filter(e -> e.getCustomName() == null)
+                                .forEach(Entity::remove);
+                    }
                 }
             }
         }
     }
-
 
 
 }

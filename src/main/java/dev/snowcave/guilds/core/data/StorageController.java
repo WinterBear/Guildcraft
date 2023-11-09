@@ -1,6 +1,5 @@
 package dev.snowcave.guilds.core.data;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import dev.snowcave.guilds.Guilds;
@@ -15,11 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by WinterBear on 05/01/2021.
@@ -28,23 +24,23 @@ public class StorageController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static void start(JavaPlugin plugin){
+    public static void start(JavaPlugin plugin) {
         RepeatingTaskUtils.everyMinutes(20, () -> StorageController.save(plugin), plugin);
     }
 
-    public static boolean save(JavaPlugin plugin){
+    public static boolean save(JavaPlugin plugin) {
         ObjectWriter ow = MAPPER.writer().withDefaultPrettyPrinter();
-        Path path = Paths.get(plugin.getDataFolder()+ "/guilds/");
-        Path backup = Paths.get(plugin.getDataFolder()+ "/backups/");
+        Path path = Paths.get(plugin.getDataFolder() + "/guilds/");
+        Path backup = Paths.get(plugin.getDataFolder() + "/backups/");
         try {
             Files.createDirectories(path);
             Files.createDirectories(backup);
 
             String backupTimestamp = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
 
-            Path todayBackup = Paths.get(plugin.getDataFolder()+ "/backups/" + backupTimestamp);
+            Path todayBackup = Paths.get(plugin.getDataFolder() + "/backups/" + backupTimestamp);
 
-            if(!Files.exists(todayBackup)){
+            if (!Files.exists(todayBackup)) {
                 Files.createDirectories(todayBackup);
                 Files.list(Paths.get(plugin.getDataFolder() + "/guilds/"))
                         .forEach(f -> backup(todayBackup, f));
@@ -56,7 +52,7 @@ public class StorageController {
                     .forEach(File::delete);
 
 
-            Guilds.GUILDS.forEach(g -> saveGuild(g, ow, plugin.getDataFolder()+ "/guilds/"));
+            Guilds.GUILDS.forEach(g -> saveGuild(g, ow, plugin.getDataFolder() + "/guilds/"));
         } catch (IOException e) {
             ChatUtils.error("There was an unexpected error creating the Guilds directory: ");
             e.printStackTrace();
@@ -64,7 +60,7 @@ public class StorageController {
         return true;
     }
 
-    private static void saveGuild(Guild guild, ObjectWriter ow, String path){
+    private static void saveGuild(Guild guild, ObjectWriter ow, String path) {
         try {
             String json = ow.writeValueAsString(guild);
             Files.write(Paths.get(path + guild.getGuildName() + ".json"), json.getBytes());
@@ -74,7 +70,7 @@ public class StorageController {
         }
     }
 
-    public static void backup(Path backupDir, Path filePath){
+    public static void backup(Path backupDir, Path filePath) {
         ChatUtils.info("Backing up " + filePath + " to " + backupDir);
         try {
             Path destination = Paths.get(backupDir.toString(), filePath.getFileName().toString());
@@ -85,9 +81,9 @@ public class StorageController {
 
     }
 
-    public static void load(JavaPlugin plugin){
+    public static void load(JavaPlugin plugin) {
         try {
-            Path path = Paths.get(plugin.getDataFolder()+ "/guilds/");
+            Path path = Paths.get(plugin.getDataFolder() + "/guilds/");
             Files.createDirectories(path);
             Files.list(Paths.get(plugin.getDataFolder() + "/guilds/"))
                     .forEach(StorageController::loadGuild);
@@ -98,7 +94,7 @@ public class StorageController {
         }
     }
 
-    private static void loadGuild(Path filePath){
+    private static void loadGuild(Path filePath) {
 
         ChatUtils.info("Loading Guild " + filePath);
         try {
@@ -108,8 +104,6 @@ public class StorageController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
 
 
     }

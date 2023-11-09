@@ -28,7 +28,7 @@ public class PublicOptionHandler extends OnOffGuildOptionHandler {
 
     @Override
     public void displayValue(Guild guild, Player player) {
-        if(guild.getGuildOptions().isPublic()){
+        if (guild.getGuildOptions().isPublic()) {
             ChatUtils.send(player, "&7Your guild is &bpublic&7. Anyone may join your guild.");
         } else {
             ChatUtils.send(player, "&7Your guild is &cprivate&7. Only players who are invited may join your guild.");

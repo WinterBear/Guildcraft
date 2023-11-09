@@ -1,7 +1,6 @@
 package dev.snowcave.guilds.commands.pois;
 
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionBonusCommandHandler;
-import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.guildhalls.GuildHallShape;
@@ -23,7 +22,7 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
 
     @Override
     public void handleWithPermissionAndBonus(Player player, User user, String[] arguments) {
-        if(arguments.length == 1){
+        if (arguments.length == 1) {
             ChatUtils.send(player, "&3" + user.getGuild().getGuildHall().getName());
             ChatUtils.send(player, "&3Location&7: &e" + LocationUtils.toDisplayString(user.getGuild().getGuildHall().getCenter()));
             ChatUtils.send(player, "&3Size&7: &b" + user.getGuild().getGuildHall().getSize());
@@ -33,12 +32,20 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
             ChatUtils.send(player, "&b/g hall name &e<&6New Name&e> &8- &7Rename your Guild Hall.");
             ChatUtils.send(player, "&b/g hall shape &e<&aCircle&8/&cSquare&e> &8- &7Change the shape of your Guild Hall's area of effect.");
         } else {
-            if(arguments[1].equalsIgnoreCase("move")){
+            if (arguments[1].equalsIgnoreCase("move")) {
                 handleMove(player, user);
-            } else if(arguments[1].equalsIgnoreCase("name")){
+            } else if (arguments[1].equalsIgnoreCase("name")) {
+                if (arguments.length < 3) {
+                    ChatUtils.send(player, "&7You must specify a name.");
+                }
                 handleName(player, user, String.join(" ", Arrays.copyOfRange(arguments, 2, arguments.length)));
-            } else if (arguments[1].equalsIgnoreCase("shape")){
-                handleShape(player, user, arguments[2]);
+            } else if (arguments[1].equalsIgnoreCase("shape")) {
+                if (arguments.length < 3) {
+                    ChatUtils.send(player, "&7You must specify a shape - &acircle&7 or &bsquare.");
+                } else {
+                    handleShape(player, user, arguments[1]);
+                }
+
             } else {
                 ChatUtils.send(player, "&7Not a valid option. Options are &emove&7, &ename &7and &eshape&7.");
             }
@@ -50,9 +57,9 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
         return GuildBonus.GUILD_HALL;
     }
 
-    private void handleMove(Player player, User user){
+    private void handleMove(Player player, User user) {
         Optional<Guild> guildAtLocation = ChunkUtils.getGuild(player.getLocation().getChunk());
-        if(guildAtLocation.isPresent() && user.getGuild().equals(guildAtLocation.get())) {
+        if (guildAtLocation.isPresent() && user.getGuild().equals(guildAtLocation.get())) {
             user.getGuild().getGuildHall().setCenter(player.getLocation());
             ChatUtils.send(player, "&3Moved Guild Hall to your current location.");
         } else {
@@ -60,16 +67,16 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
         }
     }
 
-    private void handleName(Player player, User user, String newName){
+    private void handleName(Player player, User user, String newName) {
         user.getGuild().getGuildHall().setName(newName);
         ChatUtils.send(player, "&3Changed Guild Hall name to &b" + newName);
     }
 
-    private void handleShape(Player player, User user, String shape){
-        if(shape.equalsIgnoreCase("circle")){
+    private void handleShape(Player player, User user, String shape) {
+        if (shape.equalsIgnoreCase("circle")) {
             user.getGuild().getGuildHall().setShape(GuildHallShape.CIRCLE);
             ChatUtils.send(player, "&3Set Guild Hall shape to &6Circle");
-        } else if (shape.equalsIgnoreCase("square")){
+        } else if (shape.equalsIgnoreCase("square")) {
             user.getGuild().getGuildHall().setShape(GuildHallShape.SQUARE);
             ChatUtils.send(player, "&3Set Guild Hall shape to &6Square");
         } else {

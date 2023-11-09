@@ -6,6 +6,4 @@ package dev.snowcave.guilds.core.users.permissions;
 public class Permissions {
 
 
-
-
 }

@@ -14,11 +14,11 @@ import java.util.Optional;
 /**
  * Created by WinterBear on 29/12/2020.
  */
-public abstract class GuildMemberPermissionBonusCommandHandler extends GuildMemberPermissionCommandHandler{
+public abstract class GuildMemberPermissionBonusCommandHandler extends GuildMemberPermissionCommandHandler {
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
-        if(user.getGuild().listAllBonuses().contains(getBonus())){
+        if (user.getGuild().listAllBonuses().contains(getBonus())) {
             handleWithPermissionAndBonus(player, user, arguments);
         } else {
             ChatUtils.send(player, "&7Your guild has not unlocked this ability.");

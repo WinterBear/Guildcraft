@@ -3,6 +3,7 @@ package dev.snowcave.guilds.core;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import xyz.jpenilla.squaremap.api.Point;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -18,11 +19,11 @@ public class ChunkReference {
 
     private int z;
 
-    public ChunkReference(){
+    public ChunkReference() {
         //Default Constructor
     }
 
-    public ChunkReference(Chunk chunk){
+    public ChunkReference(Chunk chunk) {
         this.worldRef = chunk.getWorld().getName();
         this.x = chunk.getX();
         this.z = chunk.getZ();
@@ -34,12 +35,53 @@ public class ChunkReference {
         this.z = z;
     }
 
-    public Optional<Chunk> get(){
+    public ChunkReference above() {
+        return new ChunkReference(worldRef, x, z + 1);
+    }
+
+    public ChunkReference below() {
+        return new ChunkReference(worldRef, x, z - 1);
+    }
+
+    public ChunkReference left() {
+        return new ChunkReference(worldRef, x - 1, z);
+    }
+
+    public ChunkReference right() {
+        return new ChunkReference(worldRef, x + 1, z);
+    }
+
+    public Optional<Chunk> get() {
         World world = Bukkit.getServer().getWorld(worldRef);
-        if(world!= null){
+        if (world != null) {
             return Optional.of(world.getChunkAt(x, z));
         }
         return Optional.empty();
+    }
+
+    //Top left corner
+    public Point origin(int chunkScale) {
+        double zPoint = (z * chunkScale) + 15;
+        double xPoint = (x * chunkScale);
+        return Point.of(xPoint, zPoint);
+    }
+
+    public Point upperRight(int chunkScale) {
+        double zPoint = (z * chunkScale) + 15;
+        double xPoint = (x * chunkScale) + 15;
+        return Point.of(xPoint, zPoint);
+    }
+
+    public Point lowerRight(int chunkScale) {
+        double zPoint = (z * chunkScale);
+        double xPoint = (x * chunkScale) + 15;
+        return Point.of(xPoint, zPoint);
+    }
+
+    public Point lowerLeft(int chunkScale) {
+        double zPoint = (z * chunkScale);
+        double xPoint = (x * chunkScale);
+        return Point.of(xPoint, zPoint);
     }
 
     @Override
@@ -47,7 +89,7 @@ public class ChunkReference {
         return x + ", " + z + " (" + worldRef + ")";
     }
 
-    public static String toString(Chunk chunk){
+    public static String toString(Chunk chunk) {
         return chunk.getX() + ", " + chunk.getZ() + " (" + chunk.getWorld().getName() + ")";
     }
 

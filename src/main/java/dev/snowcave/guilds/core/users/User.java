@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +21,7 @@ public class User {
     @JsonIgnore
     private Guild guild;
 
-    public User(){
+    public User() {
 
     }
 
@@ -47,25 +46,25 @@ public class User {
 
     @JsonIgnore
     public Optional<Role> getRole() {
-        if(guild == null){
+        if (guild == null) {
             return Optional.empty();
         }
         return guild.getRole(roleReference);
     }
 
-    public void setGuild(Guild guild){
+    public void setGuild(Guild guild) {
         this.guild = guild;
     }
 
-    public Guild getGuild(){
+    public Guild getGuild() {
         return guild;
     }
 
-    public boolean hasPermission(GuildPermission permission){
-        if(guild.getLeader().getUuid().equals(this.getUuid())){
+    public boolean hasPermission(GuildPermission permission) {
+        if (guild.getLeader().getUuid().equals(this.getUuid())) {
             return true;
         }
-        if(getRole().isPresent()){
+        if (getRole().isPresent()) {
             return getRole().get().getPermissions().contains(permission);
         }
         return false;

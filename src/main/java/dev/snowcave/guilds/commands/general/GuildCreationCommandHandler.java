@@ -6,6 +6,7 @@ import dev.snowcave.guilds.config.Prices;
 import dev.snowcave.guilds.core.GuildCreator;
 import dev.snowcave.guilds.utils.EconomyUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -28,30 +29,30 @@ public class GuildCreationCommandHandler implements GuildCommandHandler {
 
     @Override
     public void handle(Player player, String[] arguments) {
-        if(Guilds.getGuild(player).isPresent()){
+        if (Guilds.getGuild(player).isPresent()) {
             handleExistingGuild(player);
         } else {
-            if(arguments.length < 2){
+            if (arguments.length < 2) {
                 ChatUtils.send(player, "&7Usage&8: &b/guild create &e<&6Guild Name&e> &8- &7Create a new Guild");
-                ChatUtils.send(player, "&7You need 500 Lia to purchase a guild. Earn money with contracts or shops.");
+                ChatUtils.send(player, "&7You need 500 Silver to purchase a guild.");
                 return;
             }
-            if(EconomyUtils.ECONOMY.has(player, Prices.BASE_GUILD_COST)){
+            if (EconomyUtils.ECONOMY.has(player, Prices.BASE_GUILD_COST)) {
                 EconomyUtils.ECONOMY.withdrawPlayer(player, Prices.BASE_GUILD_COST);
                 String guildName = String.join(" ", Arrays.copyOfRange(arguments, 1, arguments.length));
-                if(Guilds.getGuild(guildName).isPresent()){
+                if (Guilds.getGuild(guildName).isPresent()) {
                     ChatUtils.send(player, "&7A guild named " + guildName + " already exists.");
                 } else {
                     GuildCreator.create(guildName, player);
-                    ChatUtils.broadcast(ChatUtils.format("&3The Guild &b" + guildName + " &3was created by &6" + player.getDisplayName()));
+                    Bukkit.broadcastMessage(ChatUtils.format("&3The Guild &b" + guildName + " &3was created by &6" + player.getDisplayName()));
                 }
             } else {
-                ChatUtils.send(player, "&7You need 500 Lia to purchase a guild. Earn money with contracts or shops.");
+                ChatUtils.send(player, "&7You need 500 Silver to purchase a guild.");
             }
         }
     }
 
-    private void handleExistingGuild(Player player){
+    private void handleExistingGuild(Player player) {
         ChatUtils.send(player, ChatUtils.format("&7You are already part of a guild. Leave your current guild to create a new one."));
     }
 }

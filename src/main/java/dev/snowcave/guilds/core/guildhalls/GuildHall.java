@@ -27,35 +27,39 @@ public class GuildHall {
     @JsonIgnore
     private Guild guild;
 
-    public boolean isInHall(Location location){
-        if(shape == GuildHallShape.SQUARE){
-            boolean isInX = location.getX() <= getSquareMaxX() && location.getX() >= getSquareMinX();
-            boolean isInZ = location.getZ() <= getSquareMaxZ() && location.getZ() >= getSquareMinZ();
-            return isInX && isInZ;
-        } else if (shape == GuildHallShape.CIRCLE){
-            return center.distance(center) > (size.getCircleRadius());
+    public boolean isInHall(Location location) {
+        if (location.getWorld().equals(getCenter().getWorld())) {
+            if (shape == GuildHallShape.SQUARE) {
+                boolean isInX = location.getX() <= getSquareMaxX() && location.getX() >= getSquareMinX();
+                boolean isInZ = location.getZ() <= getSquareMaxZ() && location.getZ() >= getSquareMinZ();
+                return isInX && isInZ;
+            } else if (shape == GuildHallShape.CIRCLE) {
+                Location centerYAdjusted = getCenter().clone();
+                centerYAdjusted.setY(location.getY());
+                return centerYAdjusted.distance(location) < (size.getCircleRadius());
+            }
         }
         return false;
     }
 
 
     @JsonIgnore
-    private double getSquareMaxX(){
+    private double getSquareMaxX() {
         return this.getCenter().getX() + (size.getSquareRadius());
     }
 
     @JsonIgnore
-    private double getSquareMinX(){
+    private double getSquareMinX() {
         return this.getCenter().getX() - (size.getSquareRadius());
     }
 
     @JsonIgnore
-    private double getSquareMaxZ(){
+    private double getSquareMaxZ() {
         return this.getCenter().getZ() + (size.getSquareRadius());
     }
 
     @JsonIgnore
-    private double getSquareMinZ(){
+    private double getSquareMinZ() {
         return this.getCenter().getZ() - (size.getSquareRadius());
     }
 
@@ -77,7 +81,7 @@ public class GuildHall {
     }
 
     public Location getCenter() {
-        if(center == null){
+        if (center == null) {
             String[] locationArray = centerString.split("\\|");
             center = new Location(Bukkit.getWorld(locationArray[0]), Double.parseDouble(locationArray[1]), Double.parseDouble(locationArray[2]), Double.parseDouble(locationArray[3]));
         }
@@ -108,7 +112,7 @@ public class GuildHall {
         return centerString;
     }
 
-    public void setCenterString(String centerString){
+    public void setCenterString(String centerString) {
         this.centerString = centerString;
     }
 
@@ -116,7 +120,7 @@ public class GuildHall {
         return foodStore;
     }
 
-    public void addFood(int amount){
+    public void addFood(int amount) {
         foodStore += amount;
     }
 

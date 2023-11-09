@@ -1,9 +1,7 @@
 package dev.snowcave.guilds.core.users;
 
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
-import dev.snowcave.guilds.core.users.permissions.Permissions;
 
-import java.security.acl.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +14,7 @@ public class Role {
 
     private List<GuildPermission> permissions;
 
-    public Role(){
+    public Role() {
 
     }
 
@@ -26,28 +24,28 @@ public class Role {
         this.permissions = new ArrayList<>();
     }
 
-    public Role addPermission(GuildPermission permission){
+    public Role addPermission(GuildPermission permission) {
         this.permissions.add(permission);
         return this;
     }
 
-    public List<GuildPermission> getPermissions(){
+    public List<GuildPermission> getPermissions() {
         return permissions;
     }
 
-    public void removePermission(GuildPermission permission){
+    public void removePermission(GuildPermission permission) {
         this.permissions.remove(permission);
     }
 
-    public void setPermissions(List<GuildPermission> permissions){
+    public void setPermissions(List<GuildPermission> permissions) {
         this.permissions = permissions;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title){
+    public void setTitle(String title) {
         this.title = title;
     }
 }
