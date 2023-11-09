@@ -1,7 +1,5 @@
 package dev.snowcave.guilds.core;
 
-import dev.snowcave.guilds.core.GuildBonus;
-
 import java.util.List;
 
 /**
@@ -9,15 +7,15 @@ import java.util.List;
  */
 public class Level {
 
-    private int level;
+    private final int level;
 
-    private int maxMembers;
+    private final int maxMembers;
 
-    private int maxChunks;
+    private final int maxChunks;
 
-    private List<GuildBonus> guildBonuses;
+    private final List<GuildBonus> guildBonuses;
 
-    private Double cost;
+    private final Double cost;
 
     public Level(int level, int maxMembers, int maxChunks, List<GuildBonus> guildBonuses, Double cost) {
         this.level = level;
@@ -48,7 +46,7 @@ public class Level {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "" + level;
     }
 }

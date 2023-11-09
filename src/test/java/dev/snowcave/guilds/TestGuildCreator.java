@@ -18,11 +18,11 @@ import static org.mockito.Mockito.when;
  */
 public class TestGuildCreator {
 
-    private static Map<String, World> WORLDS = new HashMap<>();
+    private static final Map<String, World> WORLDS = new HashMap<>();
 
 
-    public static Guild createGuild(String name, String worldName){
-        if(!WORLDS.containsKey(worldName)){
+    public static Guild createGuild(String name, String worldName) {
+        if (!WORLDS.containsKey(worldName)) {
             World world = mock(World.class);
             when(world.getName()).thenReturn(worldName);
             WORLDS.put(worldName, world);
@@ -40,7 +40,7 @@ public class TestGuildCreator {
         return GuildCreator.create(name, player);
     }
 
-    public static Chunk getMockChunk(String worldName){
+    public static Chunk getMockChunk(String worldName) {
         Chunk chunk = mock(Chunk.class);
         when(chunk.getX()).thenReturn(86);
         when(chunk.getZ()).thenReturn(22);

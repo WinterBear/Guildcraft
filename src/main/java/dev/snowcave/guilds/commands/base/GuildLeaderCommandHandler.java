@@ -14,9 +14,9 @@ import java.util.Optional;
  */
 public abstract class GuildLeaderCommandHandler implements GuildCommandHandler {
 
-    public void handle(Player player, String[] arguments){
+    public void handle(Player player, String[] arguments) {
         Optional<User> user = Guilds.getUser(player);
-        if(user.isPresent() && user.get().getGuild().getLeader().getUuid().equals(user.get().getUuid())){
+        if (user.isPresent() && user.get().getGuild().getLeader().getUuid().equals(user.get().getUuid())) {
             handle(player, user.get(), arguments);
         } else {
             ChatUtils.send(player, "&7You are not the leader of a guild.");
@@ -28,7 +28,7 @@ public abstract class GuildLeaderCommandHandler implements GuildCommandHandler {
     @Override
     public boolean canUse(CommandSender sender) {
         Optional<Player> player = CommandSenderUtils.getPlayer(sender);
-        if(player.isPresent()) {
+        if (player.isPresent()) {
             return Guilds.GUILDS.stream().anyMatch(g -> g.getLeader().getUuid().equals(player.get().getUniqueId()));
         }
         return false;

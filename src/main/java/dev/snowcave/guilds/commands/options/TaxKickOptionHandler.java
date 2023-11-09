@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 /**
  * Created by WinterBear on 26/12/2020.
  */
-public class TaxKickOptionHandler extends OnOffGuildOptionHandler{
+public class TaxKickOptionHandler extends OnOffGuildOptionHandler {
 
     @Override
     public void enable(Guild guild, Player player) {
@@ -28,7 +28,7 @@ public class TaxKickOptionHandler extends OnOffGuildOptionHandler{
 
     @Override
     public void displayValue(Guild guild, Player player) {
-        if(guild.getGuildOptions().isKickMembersWhoDontPayTax()){
+        if (guild.getGuildOptions().isKickMembersWhoDontPayTax()) {
             ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &awill be kicked &7from the guild.");
         } else {
             ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &cwill not be kicked &7from the guild.");

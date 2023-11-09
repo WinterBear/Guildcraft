@@ -1,7 +1,6 @@
 package dev.snowcave.guilds.scheduler;
 
 import dev.snowcave.guilds.Guilds;
-import dev.snowcave.guilds.config.Prices;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.utils.EconomyUtils;
@@ -16,40 +15,40 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class TaxListener {
 
-    public static void start(JavaPlugin plugin){
+    public static void start(JavaPlugin plugin) {
         RepeatingTaskUtils.everyMinutes(5, TaxListener::doTax, plugin);
     }
 
-    private static boolean doTax(){
-        if(!taxDoneForDay()){
+    private static boolean doTax() {
+        if (!taxDoneForDay()) {
             Guilds.GUILDS.forEach(TaxListener::doTax);
             Guilds.GUILDS.forEach(TaxListener::doUpkeep);
-            ChatUtils.broadcast("&bA new day is here. Guild Taxes and Upkeep have been taken.");
+            Bukkit.broadcastMessage(ChatUtils.format("&bA new day is here. Guild Taxes and Upkeep have been taken."));
         }
         return true;
     }
 
-    private static boolean taxDoneForDay(){
+    private static boolean taxDoneForDay() {
         return true;
     }
 
-    private static void doUpkeep(Guild guild){
-        if(guild.getBalance() >= 10.0){
+    private static void doUpkeep(Guild guild) {
+        if (guild.getBalance() >= 10.0) {
             guild.setBalance(guild.getBalance() - 10.0);
         } else {
             Guilds.GUILDS.remove(guild);
-            ChatUtils.broadcast("&7The Guild " + guild + " was closed due to lack of funding.");
+            Bukkit.broadcastMessage(ChatUtils.format("&7The Guild " + guild + " was closed due to lack of funding."));
         }
     }
 
-    private static void doTax(Guild guild){
+    private static void doTax(Guild guild) {
         Double tax = guild.getGuildOptions().getTax();
-        for(User user : guild.getMembers()){
+        for (User user : guild.getMembers()) {
             OfflinePlayer player = Bukkit.getOfflinePlayer(user.getUuid());
-            if(EconomyUtils.ECONOMY.has(player, tax)) {
+            if (EconomyUtils.ECONOMY.has(player, tax)) {
                 EconomyUtils.ECONOMY.withdrawPlayer(player, tax);
             } else {
-                if(guild.getGuildOptions().isKickMembersWhoDontPayTax() && !guild.getLeader().getUuid().equals(user.getUuid())){
+                if (guild.getGuildOptions().isKickMembersWhoDontPayTax() && !guild.getLeader().getUuid().equals(user.getUuid())) {
                     guild.getMembers().remove(player);
                 }
             }

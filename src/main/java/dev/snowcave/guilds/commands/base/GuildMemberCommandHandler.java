@@ -14,9 +14,9 @@ import java.util.Optional;
  */
 public abstract class GuildMemberCommandHandler implements GuildCommandHandler {
 
-    public void handle(Player player, String[] arguments){
+    public void handle(Player player, String[] arguments) {
         Optional<User> user = Guilds.getUser(player);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             handle(player, user.get(), arguments);
         } else {
             ChatUtils.send(player, "&7You do not have a guild.");

@@ -1,7 +1,5 @@
 package dev.snowcave.guilds.core.users.permissions;
 
-import dev.snowcave.guilds.core.Guild;
-
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -23,16 +21,16 @@ public enum GuildPermission {
     MOVE_SPAWN("Move Spawn", "Allows the user to move the guild spawn."),
     GUILDHALL("Guild Hall", "Allows the user to manage the guild hall.");
 
-    private String displayName;
+    private final String displayName;
 
-    private String description;
+    private final String description;
 
-    GuildPermission(String name, String description){
+    GuildPermission(String name, String description) {
         this.displayName = name;
         this.description = description;
     }
 
-    public static Optional<GuildPermission> get(String name){
+    public static Optional<GuildPermission> get(String name) {
         return Arrays.stream(GuildPermission.values())
                 .filter(g -> g.getDisplayName().equalsIgnoreCase(name))
                 .findFirst();

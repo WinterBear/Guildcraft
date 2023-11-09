@@ -4,7 +4,9 @@ import dev.snowcave.guilds.commands.banking.GuildDepositCommandHandler;
 import dev.snowcave.guilds.commands.banking.GuildWithdrawCommandHandler;
 import dev.snowcave.guilds.commands.base.GuildCommandHandler;
 import dev.snowcave.guilds.commands.claims.GuildClaimCommandHandler;
+import dev.snowcave.guilds.commands.claims.GuildOutpostCommandHandler;
 import dev.snowcave.guilds.commands.claims.GuildUnclaimCommandHandler;
+import dev.snowcave.guilds.commands.claims.GuildWardChunkCommandHandler;
 import dev.snowcave.guilds.commands.general.*;
 import dev.snowcave.guilds.commands.invites.GuildInviteCommandHandler;
 import dev.snowcave.guilds.commands.invites.GuildJoinCommandHandler;
@@ -15,7 +17,6 @@ import dev.snowcave.guilds.commands.pois.GuildHallCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildMoveSpawnCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildSpawnCommandHandler;
 import dev.snowcave.guilds.commands.pois.GuildStoresCommandHandler;
-import dev.snowcave.guilds.core.guildhalls.GuildHall;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import io.github.winterbear.WinterCoreUtils.CommandSenderUtils;
 import org.bukkit.command.Command;
@@ -44,6 +45,8 @@ public class GuildCommand implements CommandExecutor {
             new GuildLevelCommandHandler(),
             new GuildViewLevelCommandHandler(),
             new GuildRolesCommandHandler(),
+            new GuildOutpostCommandHandler(),
+            new GuildWardChunkCommandHandler(),
 
             //Joining & Leaving
             new GuildJoinCommandHandler(),
@@ -70,8 +73,8 @@ public class GuildCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String alias, String[] arguments) {
-        if(alias.equalsIgnoreCase(MAIN_COMMAND_ALIAS) || alias.equalsIgnoreCase(MAIN_COMMAND_ALIAS_SHORT)){
-            if(arguments.length == 0){
+        if (alias.equalsIgnoreCase(MAIN_COMMAND_ALIAS) || alias.equalsIgnoreCase(MAIN_COMMAND_ALIAS_SHORT)) {
+            if (arguments.length == 0) {
                 ChatUtils.send(commandSender, ChatUtils.format("&7Usage&8:"));
                 displayUsage(commandSender);
             } else if (COMMANDS.stream().anyMatch(c -> c.getKeywords().stream().anyMatch(k -> k.equalsIgnoreCase(arguments[0])))) {
@@ -85,18 +88,17 @@ public class GuildCommand implements CommandExecutor {
     }
 
 
-
-    public void displayUsage(CommandSender sender){
-        for(GuildCommandHandler commandHandler : COMMANDS){
-            if(commandHandler.canUse(sender)){
+    public void displayUsage(CommandSender sender) {
+        for (GuildCommandHandler commandHandler : COMMANDS) {
+            if (commandHandler.canUse(sender)) {
                 ChatUtils.send(sender, commandHandler.describe());
             }
         }
     }
 
     @io.github.winterbear.wintercore.Annotations.Command(aliases = "g")
-    public void guild(CommandSender commandSender, Command command, String alias, String[] arguments){
-        if(CommandSenderUtils.getPlayer(commandSender).isPresent()){
+    public void guild(CommandSender commandSender, Command command, String alias, String[] arguments) {
+        if (CommandSenderUtils.getPlayer(commandSender).isPresent()) {
             COMMANDS.stream()
                     .filter(c -> c.getKeywords().stream().anyMatch(k -> k.equalsIgnoreCase(arguments[0])))
                     .forEach(c -> c.handle(CommandSenderUtils.getPlayer(commandSender).get(), arguments));

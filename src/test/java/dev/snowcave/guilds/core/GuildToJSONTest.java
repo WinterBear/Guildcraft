@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import dev.snowcave.guilds.TestGuildCreator;
-import dev.snowcave.guilds.core.data.StorageController;
 import junit.framework.TestCase;
 import org.junit.Test;
 

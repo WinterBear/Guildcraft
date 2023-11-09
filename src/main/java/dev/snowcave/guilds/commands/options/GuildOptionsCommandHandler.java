@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Created by WinterBear on 20/12/2020.
- *
+ * <p>
  * /guild options tax 20
  * /guild options explosions on
  * /guild options symbol
@@ -21,7 +21,6 @@ import java.util.List;
  * /guild options noticeboard "Welcome to dave's guild"
  * /guild options tag ABBA
  * /guild options public off
- *
  */
 public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHandler {
 
@@ -36,6 +35,7 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
             new TagOptionHandler(),
             new ColorOptionHandler(),
             new RenameGuildOptionHandler());
+
     @Override
     public List<String> getKeywords() {
         return Arrays.asList("options", "o");
@@ -46,8 +46,8 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
         return "&b/guild options &8- &7View and edit options for your Guild";
     }
 
-    private String onOff(boolean value){
-        if(value){
+    private String onOff(boolean value) {
+        if (value) {
             return "&aOn";
         } else {
             return "&cOff";
@@ -57,8 +57,8 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
         Guild guild = user.getGuild();
-        if((arguments[0].equalsIgnoreCase("options") || arguments[0].equalsIgnoreCase("o"))){
-            if(arguments.length > 1) {
+        if ((arguments[0].equalsIgnoreCase("options") || arguments[0].equalsIgnoreCase("o"))) {
+            if (arguments.length > 1) {
                 for (GuildOptionHandler handler : OPTION_HANDLERS) {
                     if (arguments[1].equalsIgnoreCase(handler.getKeyword())) {
                         if (arguments.length > 2) {
@@ -71,9 +71,9 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
                 }
             }
             ChatUtils.send(player, "&b/g options tax &e<&6amount&e> &8- &7Set the daily tax charged to your guild members &8(&b" + guild.getGuildOptions().getTax() + "&8)");
-            ChatUtils.send(player, "&b/g options explosions &e<&aon&8/&coff&e> &8- &7Toggle explosions within your town &8(" + onOff(guild.getGuildOptions().isExplosionsEnabled()) + "&8)");
-            ChatUtils.send(player, "&b/g options symbol &8- &7Shows a list of symbols you can select from for your town.");
-            ChatUtils.send(player, "&b/g options symbol &e<&6symbol&e> &8- &7Select a symbol for your town. &8(&6" + guild.getGuildOptions().getGuildSymbol().getSymbol() + "&8)");
+            ChatUtils.send(player, "&b/g options explosions &e<&aon&8/&coff&e> &8- &7Toggle explosions within your guild &8(" + onOff(guild.getGuildOptions().isExplosionsEnabled()) + "&8)");
+            ChatUtils.send(player, "&b/g options symbol &8- &7Shows a list of symbols you can select from for your guild.");
+            ChatUtils.send(player, "&b/g options symbol &e<&6symbol&e> &8- &7Select a symbol for your guild. &8(&6" + guild.getGuildOptions().getGuildSymbol().getSymbol() + "&8)");
             ChatUtils.send(player, "&b/g options taxkick &e<&aon&8/&coff&e> &8- &7Automatically kick players who fail to pay their taxes. &8(" + onOff(guild.getGuildOptions().isKickMembersWhoDontPayTax()) + "&8)");
             ChatUtils.send(player, "&b/g options pvp &e<&aon&8/&coff&e> &8- &7Toggle pvp within the guild &8(" + onOff(guild.getGuildOptions().isPvpEnabled()) + "&8)");
             ChatUtils.send(player, "&b/g options noticeboard &e<&6message&e> &8- &7Set a message on the guild noticeboard");
@@ -89,9 +89,6 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
     }
 
     //Taxes - Requires Tax Editing Permission
-
-
-
 
 
 }

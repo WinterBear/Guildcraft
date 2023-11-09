@@ -22,7 +22,7 @@ public class GuildMoveSpawnCommandHandler extends GuildMemberPermissionBonusComm
     public void handleWithPermissionAndBonus(Player player, User user, String[] arguments) {
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(player.getLocation().getChunk());
         Guild userGuild = user.getGuild();
-        if(chunkGuild.isPresent() && chunkGuild.get().equals(userGuild)){
+        if (chunkGuild.isPresent() && chunkGuild.get().equals(userGuild)) {
             userGuild.setSpawnLocation(player.getLocation());
             ChatUtils.send(player, "&3Guild spawn was moved to your current location.");
         } else {

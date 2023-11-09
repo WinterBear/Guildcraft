@@ -8,9 +8,9 @@ import dev.snowcave.guilds.core.users.User;
  */
 public class Invite {
 
-    private Guild guild;
+    private final Guild guild;
 
-    private User user;
+    private final User user;
 
     public Invite(Guild guild, User user) {
         this.guild = guild;

@@ -1,7 +1,6 @@
 package dev.snowcave.guilds.commands.base;
 
 import dev.snowcave.guilds.Guilds;
-import dev.snowcave.guilds.commands.base.GuildMemberCommandHandler;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
@@ -16,8 +15,8 @@ import java.util.Optional;
  */
 public abstract class GuildMemberPermissionCommandHandler extends GuildMemberCommandHandler {
 
-    public void handle(Player player, User user, String[] arguments){
-        if(user.hasPermission(getPermission())){
+    public void handle(Player player, User user, String[] arguments) {
+        if (user.hasPermission(getPermission())) {
             handleWithPermission(player, user, arguments);
         } else {
             ChatUtils.send(player, "&7You do not have permission to use this command.");

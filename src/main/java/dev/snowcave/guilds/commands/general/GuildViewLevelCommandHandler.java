@@ -1,10 +1,8 @@
 package dev.snowcave.guilds.commands.general;
 
 import dev.snowcave.guilds.commands.base.GuildMemberCommandHandler;
-import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
 import dev.snowcave.guilds.config.Levels;
 import dev.snowcave.guilds.core.users.User;
-import dev.snowcave.guilds.core.users.permissions.GuildPermission;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.entity.Player;
 
@@ -18,21 +16,21 @@ public class GuildViewLevelCommandHandler extends GuildMemberCommandHandler {
 
     @Override
     public void handle(Player player, User user, String[] arguments) {
-        if(arguments.length < 2){
+        if (arguments.length < 2) {
             ChatUtils.send(player, describe());
             return;
         }
         int maxLevel = Levels.LEVELS.size();
         try {
             int level = Integer.parseInt(arguments[1]);
-            if(level > maxLevel){
+            if (level > maxLevel) {
                 ChatUtils.send(player, "&cError - The maximum level is " + maxLevel);
                 return;
             } else {
-                ChatUtils.send(player,"&bGuild Bonuses&8: " + Levels.get(level).getGuildBonuses());
-                ChatUtils.send(player,"&bMax Chunks&8: &3" + Levels.get(level).getMaxChunks() + " &bMax Members&8: &3" + Levels.get(level).getMaxMembers());
+                ChatUtils.send(player, "&bGuild Bonuses&8: " + Levels.get(level).getGuildBonuses());
+                ChatUtils.send(player, "&bMax Chunks&8: &3" + Levels.get(level).getMaxChunks() + " &bMax Members&8: &3" + Levels.get(level).getMaxMembers());
             }
-        } catch (NumberFormatException nfe){
+        } catch (NumberFormatException nfe) {
             ChatUtils.send(player, "&cError - " + arguments[1] + " is not a number.");
         }
 

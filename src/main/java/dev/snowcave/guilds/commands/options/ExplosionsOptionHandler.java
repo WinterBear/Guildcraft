@@ -2,7 +2,6 @@ package dev.snowcave.guilds.commands.options;
 
 import dev.snowcave.guilds.core.Guild;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
-import net.milkbowl.vault.chat.Chat;
 import org.bukkit.entity.Player;
 
 /**
@@ -29,7 +28,7 @@ public class ExplosionsOptionHandler extends OnOffGuildOptionHandler {
 
     @Override
     public void displayValue(Guild guild, Player player) {
-        if(guild.getGuildOptions().isExplosionsEnabled()){
+        if (guild.getGuildOptions().isExplosionsEnabled()) {
             ChatUtils.send(player, "&7Explosions are &aenabled &7within guild territory. Explosions outside guild territory will still be unable to affect blocks and entities within guild territory.");
         } else {
             ChatUtils.send(player, "&7Explosions are &cdisabled &7within guild territory. Explosions will be unable to affect blocks and entities within guild territory.");

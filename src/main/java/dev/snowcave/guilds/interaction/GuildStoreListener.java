@@ -21,7 +21,7 @@ public class GuildStoreListener implements Listener {
 
     private static final Map<Material, Integer> FOOD = foodValues();
 
-    private static Map<Material, Integer> foodValues(){
+    private static Map<Material, Integer> foodValues() {
         Map<Material, Integer> values = new HashMap<>();
 
         values.put(Material.APPLE, 4);
@@ -56,15 +56,17 @@ public class GuildStoreListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event){
-        if(event.getPlayer() instanceof Player && OPEN_STORES.contains(event.getPlayer().getUniqueId())) {
+    public void onInventoryClose(InventoryCloseEvent event) {
+        if (event.getPlayer() instanceof Player && OPEN_STORES.contains(event.getPlayer().getUniqueId())) {
             Optional<User> user = Guilds.getUser((Player) event.getPlayer());
             int depositedFood = 0;
-            for(ItemStack food : event.getInventory().getContents()){
-                if(food != null) {
+            for (ItemStack food : event.getInventory().getContents()) {
+                if (food != null) {
                     int amount = food.getAmount();
+
+                    double modifier = user.get().getGuild().storeModifier();
                     if (FOOD.containsKey(food.getType())) {
-                        depositedFood += amount * FOOD.get(food.getType());
+                        depositedFood += Math.floor(amount * FOOD.get(food.getType()) * modifier);
                     } else {
                         event.getPlayer().getInventory().addItem(food);
                     }

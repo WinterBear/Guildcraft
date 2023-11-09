@@ -17,17 +17,17 @@ public class GuildWithdrawCommandHandler extends GuildMemberPermissionCommandHan
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
-        if(arguments.length > 1){
+        if (arguments.length > 1) {
             try {
                 double amount = Double.parseDouble(arguments[1]);
-                if(user.getGuild().getBalance() > amount){
+                if (user.getGuild().getBalance() > amount) {
                     user.getGuild().withdraw(amount);
                     EconomyUtils.ECONOMY.depositPlayer(player, amount);
                     user.getGuild().broadcast("&b" + player.getName() + " &3withdrew &6" + amount + " &3from the guild bank.");
                 } else {
                     ChatUtils.send(player, "&7Your guild does not have " + amount);
                 }
-            } catch (NumberFormatException numberFormatException){
+            } catch (NumberFormatException numberFormatException) {
                 ChatUtils.send(player, "&cError &8- &7Amount must be a number.");
             }
         } else {

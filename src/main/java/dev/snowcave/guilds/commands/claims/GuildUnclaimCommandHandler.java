@@ -24,8 +24,10 @@ public class GuildUnclaimCommandHandler extends GuildMemberPermissionCommandHand
         Guild guild = user.getGuild();
         Chunk chunk = player.getLocation().getChunk();
         Optional<Guild> chunkOwner = ChunkUtils.getGuild(chunk);
-        if(chunkOwner.isPresent()){
-            if(chunkOwner.get().equals(guild)){
+        if (chunkOwner.isPresent()) {
+            if (guild.allChunks().size() < 2) {
+                ChatUtils.send(player, ChatUtils.format("&7You cannot unclaim the last chunk in a guild."));
+            } else if (chunkOwner.get().equals(guild)) {
                 guild.unclaimChunk(chunk);
                 ChatUtils.send(player, ChatUtils.format("&7Unclaimed chunk &b" + ChunkReference.toString(chunk)));
             } else {

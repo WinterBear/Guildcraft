@@ -3,6 +3,7 @@ package dev.snowcave.guilds.commands.options;
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.Guild;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
@@ -17,12 +18,12 @@ public class RenameGuildOptionHandler implements GuildOptionHandler {
 
     @Override
     public void setValue(Guild guild, Player player, String argument) {
-        if(Guilds.getGuild(argument).isPresent()){
+        if (Guilds.getGuild(argument).isPresent()) {
             ChatUtils.send(player, "&3There is already a Guild called " + argument);
         } else {
             String oldName = guild.getGuildName();
             guild.setGuildName(argument);
-            ChatUtils.broadcast("&3The Guild &6" + oldName + "&3 was reformed, we are now known as &6" + argument);
+            Bukkit.broadcastMessage(ChatUtils.format("&3The Guild &6" + oldName + "&3 was reformed, we are now known as &6" + argument));
         }
     }
 

@@ -1,19 +1,15 @@
 package dev.snowcave.guilds.core;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import dev.snowcave.guilds.config.DefaultRoles;
 import dev.snowcave.guilds.config.Levels;
 import dev.snowcave.guilds.core.guildhalls.GuildHall;
 import dev.snowcave.guilds.core.users.Role;
-import dev.snowcave.guilds.utils.ChunkUtils;
+import dev.snowcave.guilds.core.users.User;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import dev.snowcave.guilds.core.users.User;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -31,7 +27,7 @@ public class Guild {
 
     private int level = 1;
 
-    private ChunkStore chunks = new ChunkStore();
+    private final ChunkStore chunks = new ChunkStore();
 
     private String spawn;
 
@@ -40,6 +36,8 @@ public class Guild {
     private GuildOptions guildOptions;
 
     private List<Role> roles;
+
+    private Map<String, ChunkStore> outposts = new HashMap<>();
 
     private GuildHall guildHall;
 
@@ -60,6 +58,7 @@ public class Guild {
         return guildName;
     }
 
+
     public void setGuildName(String guildName) {
         this.guildName = guildName;
     }
@@ -68,7 +67,7 @@ public class Guild {
         return leader;
     }
 
-    public Optional<User> getMember(Player player){
+    public Optional<User> getMember(Player player) {
         return members.stream()
                 .filter(u -> u.getUuid().equals(player.getUniqueId()))
                 .findFirst();
@@ -92,11 +91,11 @@ public class Guild {
         return Levels.get(level);
     }
 
-    public List<GuildBonus> listAllBonuses(){
+    public List<GuildBonus> listAllBonuses() {
         return Levels.getAllGuildBonuses(Levels.get(level));
     }
 
-    public int getRawLevel(){
+    public int getRawLevel() {
         return level;
     }
 
@@ -108,22 +107,81 @@ public class Guild {
         return chunks;
     }
 
-    public ChunkReference claimChunk(Chunk chunk){
+    @JsonIgnore
+    public Optional<ChunkReference> getChunkRef(Chunk chunk){
+        return chunks.get(chunk);
+    }
+
+    public List<ChunkReference> allChunks() {
+        List<ChunkReference> refs = new ArrayList<>(chunks.getChunkReferences());
+        outposts.keySet().forEach(o -> refs.addAll(outposts.get(o).getChunkReferences()));
+        return refs;
+    }
+
+    public int claimCount() {
+        return allChunks().size();
+    }
+
+    public double storeModifier() {
+        List<GuildBonus> bonuses = Levels.getAllGuildBonuses(getLevel());
+        if (bonuses.contains(GuildBonus.BOOST_FOOD_4)) {
+            return 1;
+        } else if (bonuses.contains(GuildBonus.BOOST_FOOD_3)) {
+            return 0.9;
+        } else if (bonuses.contains(GuildBonus.BOOST_FOOD_2)) {
+            return 0.8;
+        } else if (bonuses.contains(GuildBonus.BOOST_FOOD)) {
+            return 0.7;
+        } else {
+            return 0.6;
+        }
+    }
+
+    public ChunkReference claimChunk(Chunk chunk) {
         ChunkReference chunkReference = new ChunkReference(chunk);
         this.chunks.addChunk(chunkReference);
         return chunkReference;
     }
 
-    public void unclaimChunk(Chunk chunk){
+    public ChunkReference createNewOutpost(String outpostRef, Chunk spawnChunk) {
+        ChunkReference chunkReference = new ChunkReference(spawnChunk);
+        if (!outposts.containsKey(outpostRef)) {
+            outposts.put(outpostRef, new ChunkStore());
+            outposts.get(outpostRef).addChunk(chunkReference);
+            return chunkReference;
+        } else {
+            return null;
+        }
+    }
+
+    public ChunkReference claimOutpostChunk(String outpostRef, Chunk chunk) {
+        ChunkReference chunkReference = new ChunkReference(chunk);
+        if (outposts.containsKey(outpostRef)) {
+            this.outposts.get(outpostRef).addChunk(chunkReference);
+            return chunkReference;
+        }
+        return null;
+    }
+
+    public void unclaimChunk(Chunk chunk) {
+        ChunkReference chunkReference = new ChunkReference(chunk);
+        for (String outpost : outposts.keySet()) {
+            if (outposts.get(outpost).getChunkReferences().stream().anyMatch(chunkReference::equals)) {
+                outposts.get(outpost).removeChunk(chunk);
+                if (outposts.get(outpost).getChunkReferences().isEmpty()) {
+                    outposts.remove(outpost);
+                }
+            }
+        }
         chunks.removeChunk(chunk);
         chunks.removeChunk(chunk);
     }
 
-    public String getSpawn(){
+    public String getSpawn() {
         return spawn;
     }
 
-    public void setSpawn(String spawnAsString){
+    public void setSpawn(String spawnAsString) {
         this.spawn = spawnAsString;
     }
 
@@ -138,7 +196,7 @@ public class Guild {
         this.spawn = spawn.getWorld().getName() + "|" + spawn.getX() + "|" + spawn.getY() + "|" + spawn.getZ();
     }
 
-    public boolean hasMember(Player player){
+    public boolean hasMember(Player player) {
         return members.stream().anyMatch(u -> u.getUuid().equals(player.getUniqueId()));
     }
 
@@ -147,20 +205,20 @@ public class Guild {
         return guildOptions.isPublic();
     }
 
-    public void broadcast(String message){
-        for(User user : members){
+    public void broadcast(String message) {
+        for (User user : members) {
             Player player = Bukkit.getPlayer(user.getUuid());
-            if(player != null && player.isOnline()){
+            if (player != null && player.isOnline()) {
                 ChatUtils.send(player, ChatUtils.format(message));
             }
         }
     }
 
-    public void deposit(Double amount){
+    public void deposit(Double amount) {
         this.balance += amount;
     }
 
-    public void withdraw(Double amount){
+    public void withdraw(Double amount) {
         this.balance -= amount;
     }
 
@@ -188,7 +246,7 @@ public class Guild {
         return roles;
     }
 
-    public Optional<Role> getRole(String roleReference){
+    public Optional<Role> getRole(String roleReference) {
         return roles.stream()
                 .filter(r -> r.getTitle().equalsIgnoreCase(roleReference))
                 .findFirst();
@@ -199,9 +257,39 @@ public class Guild {
     }
 
     public void setGuildHall(GuildHall guildHall) {
-        if(guildHall != null){
+        if (guildHall != null) {
             this.guildHall = guildHall;
             guildHall.setGuild(this);
         }
+    }
+
+    public void initOutposts() {
+        if (this.outposts == null) {
+            this.outposts = new HashMap<>();
+        }
+    }
+
+    public Map<String, ChunkStore> getOutposts() {
+        return outposts;
+    }
+
+    @JsonIgnore
+    public int getMaxOutposts() {
+        List<GuildBonus> bonuses = Levels.getAllGuildBonuses(getLevel());
+        if (bonuses.contains(GuildBonus.OUTPOSTS_4)) {
+            return 5;
+        } else if (bonuses.contains(GuildBonus.OUTPOSTS_3)) {
+            return 4;
+        } else if (bonuses.contains(GuildBonus.OUTPOSTS_2)) {
+            return 3;
+        } else if (bonuses.contains(GuildBonus.OUTPOSTS_1)) {
+            return 2;
+        } else {
+            return 0;
+        }
+    }
+
+    public void setOutposts(Map<String, ChunkStore> outposts) {
+        this.outposts = outposts;
     }
 }

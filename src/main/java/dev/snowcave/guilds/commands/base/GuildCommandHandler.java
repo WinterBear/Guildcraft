@@ -1,6 +1,5 @@
 package dev.snowcave.guilds.commands.base;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -11,14 +10,14 @@ import java.util.List;
  */
 public interface GuildCommandHandler {
 
-        List<String> getKeywords();
+    List<String> getKeywords();
 
-        public String describe();
+    String describe();
 
-        void handle(Player player, String[] arguments);
+    void handle(Player player, String[] arguments);
 
-        public default boolean canUse(CommandSender player){
-            return true;
-        }
+    default boolean canUse(CommandSender player) {
+        return true;
+    }
 
 }
