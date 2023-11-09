@@ -1,5 +1,6 @@
 package dev.snowcave.guilds.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -19,6 +20,8 @@ public class ChunkReference {
 
     private int z;
 
+    private ChunkMetadata chunkMetadata;
+
     public ChunkReference() {
         //Default Constructor
     }
@@ -27,6 +30,8 @@ public class ChunkReference {
         this.worldRef = chunk.getWorld().getName();
         this.x = chunk.getX();
         this.z = chunk.getZ();
+        this.chunkMetadata = new ChunkMetadata();
+        this.chunkMetadata.setWardMobs(true);
     }
 
     public ChunkReference(String worldRef, int x, int z) {
@@ -118,6 +123,22 @@ public class ChunkReference {
 
     public int getZ() {
         return z;
+    }
+
+    public ChunkMetadata getChunkMetadata() {
+        return chunkMetadata;
+    }
+
+    @JsonIgnore
+    public ChunkMetadata initOrGetChunkMetadata(){
+        if(chunkMetadata == null){
+            chunkMetadata = new ChunkMetadata();
+        }
+        return chunkMetadata;
+    }
+
+    public void setChunkMetadata(ChunkMetadata chunkMetadata) {
+        this.chunkMetadata = chunkMetadata;
     }
 
     public void setWorldRef(String worldRef) {

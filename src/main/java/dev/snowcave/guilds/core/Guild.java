@@ -107,6 +107,11 @@ public class Guild {
         return chunks;
     }
 
+    @JsonIgnore
+    public Optional<ChunkReference> getChunkRef(Chunk chunk){
+        return chunks.get(chunk);
+    }
+
     public List<ChunkReference> allChunks() {
         List<ChunkReference> refs = new ArrayList<>(chunks.getChunkReferences());
         outposts.keySet().forEach(o -> refs.addAll(outposts.get(o).getChunkReferences()));

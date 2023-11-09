@@ -6,6 +6,7 @@ import dev.snowcave.guilds.commands.base.GuildCommandHandler;
 import dev.snowcave.guilds.commands.claims.GuildClaimCommandHandler;
 import dev.snowcave.guilds.commands.claims.GuildOutpostCommandHandler;
 import dev.snowcave.guilds.commands.claims.GuildUnclaimCommandHandler;
+import dev.snowcave.guilds.commands.claims.GuildWardChunkCommandHandler;
 import dev.snowcave.guilds.commands.general.*;
 import dev.snowcave.guilds.commands.invites.GuildInviteCommandHandler;
 import dev.snowcave.guilds.commands.invites.GuildJoinCommandHandler;
@@ -45,6 +46,7 @@ public class GuildCommand implements CommandExecutor {
             new GuildViewLevelCommandHandler(),
             new GuildRolesCommandHandler(),
             new GuildOutpostCommandHandler(),
+            new GuildWardChunkCommandHandler(),
 
             //Joining & Leaving
             new GuildJoinCommandHandler(),

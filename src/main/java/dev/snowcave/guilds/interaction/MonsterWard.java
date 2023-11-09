@@ -32,14 +32,16 @@ public class MonsterWard {
     public static void wardMobs(Guild guild) {
         if (Levels.getAllGuildBonuses(guild.getLevel()).contains(GuildBonus.MONSTER_WARD)) {
             for (ChunkReference chunkReference : guild.allChunks()) {
-                World world = Bukkit.getServer().getWorld(chunkReference.getWorldRef());
-                if (world != null) {
-                    Chunk chunk = world.getChunkAt(chunkReference.getX(), chunkReference.getZ());
-                    if (chunk.isLoaded()) {
-                        Arrays.stream(chunk.getEntities())
-                                .filter(e -> EntityTypeUtils.HOSTILE_ENTITIES.contains(e.getType()))
-                                .filter(e -> e.getCustomName() == null)
-                                .forEach(Entity::remove);
+                if(chunkReference.getChunkMetadata() == null || chunkReference.getChunkMetadata().isWardMobs()){
+                    World world = Bukkit.getServer().getWorld(chunkReference.getWorldRef());
+                    if (world != null) {
+                        Chunk chunk = world.getChunkAt(chunkReference.getX(), chunkReference.getZ());
+                        if (chunk.isLoaded()) {
+                            Arrays.stream(chunk.getEntities())
+                                    .filter(e -> EntityTypeUtils.HOSTILE_ENTITIES.contains(e.getType()))
+                                    .filter(e -> e.getCustomName() == null)
+                                    .forEach(Entity::remove);
+                        }
                     }
                 }
             }
