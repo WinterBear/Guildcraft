@@ -245,10 +245,10 @@ public class MapRenderer {
                 .fill(true)
                 .fillOpacity(0.2)
                 .stroke(true)
-                .strokeColor(Color.CYAN)
+                .strokeColor(Color.decode(guild.getGuildOptions().getColor()))
                 .strokeWeight(1)
                 .strokeOpacity(1.0)
-                .fillColor(Color.CYAN)
+                .fillColor(Color.decode(guild.getGuildOptions().getColor()))
                 .build();
     }
 
