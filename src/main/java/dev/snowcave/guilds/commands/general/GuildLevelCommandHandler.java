@@ -20,7 +20,7 @@ public class GuildLevelCommandHandler extends GuildMemberPermissionCommandHandle
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("levelup");
+        return List.of("levelup");
     }
 
     @Override
@@ -31,7 +31,9 @@ public class GuildLevelCommandHandler extends GuildMemberPermissionCommandHandle
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
         Guild guild = user.getGuild();
-        if (guild.getBalance() >= Levels.getUpgradeCost(guild.getLevel())) {
+        if (!Levels.canUpgrade(guild.getLevel())){
+            ChatUtils.send(player, ChatUtils.format("&7You are already at the max guild level! Congratulations"));
+        } else if (guild.getBalance() >= Levels.getUpgradeCost(guild.getLevel())) {
             guild.withdraw(Levels.getUpgradeCost(guild.getLevel()));
             guild.setRawLevel(guild.getLevel().getLevel() + 1);
             guild.getLevel().getGuildBonuses().forEach(b -> b.levelUpAction(guild));

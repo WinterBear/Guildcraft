@@ -19,7 +19,7 @@ public class GuildCreationCommandHandler implements GuildCommandHandler {
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("create");
+        return List.of("create");
     }
 
     @Override

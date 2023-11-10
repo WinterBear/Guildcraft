@@ -51,7 +51,7 @@ public class GuildJoinCommandHandler implements GuildCommandHandler {
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("join");
+        return List.of("join");
     }
 
     @Override

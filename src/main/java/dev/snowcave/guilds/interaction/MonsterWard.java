@@ -6,6 +6,7 @@ import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.utils.EntityTypeUtils;
+import dev.snowcave.guilds.utils.RepeatingTask;
 import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -21,7 +22,7 @@ import java.util.Arrays;
 public class MonsterWard {
 
     public static void start(JavaPlugin plugin) {
-        RepeatingTaskUtils.everyTick(10, MonsterWard::wardMobs, plugin);
+        RepeatingTaskUtils.everyTick(10, new RepeatingTask("Monster Ward", MonsterWard::wardMobs), plugin);
     }
 
     public static boolean wardMobs() {

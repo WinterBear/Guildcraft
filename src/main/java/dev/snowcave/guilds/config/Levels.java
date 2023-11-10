@@ -17,7 +17,7 @@ public class Levels {
         return LEVELS.get(level - 1);
     }
 
-    public static List<Level> LEVELS = levels();
+    public static final List<Level> LEVELS = levels();
 
     public static Double getUpgradeCost(Level level) {
         return LEVELS.get(level.getLevel()).getCost();

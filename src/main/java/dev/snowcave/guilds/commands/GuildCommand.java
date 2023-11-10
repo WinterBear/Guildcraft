@@ -35,7 +35,7 @@ public class GuildCommand implements CommandExecutor {
 
     private static final String MAIN_COMMAND_ALIAS_SHORT = "g";
 
-    List<GuildCommandHandler> COMMANDS = Arrays.asList(
+    private static final List<GuildCommandHandler> COMMANDS = Arrays.asList(
             //General
             new GuildClaimCommandHandler(),
             new GuildUnclaimCommandHandler(),

@@ -25,7 +25,7 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("info");
+        return List.of("info");
     }
 
     @Override
@@ -56,7 +56,7 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
         ChatColor color = ChatColor.of(guild.getGuildOptions().getColor());
         ChatUtils.send(player, ChatUtils.format("&c*&6 --- ₊&3˚&f" + symbol + " " + color + guild.getGuildName() + " &7(&3Lvl. &6" + guild.getLevel() + "&7) &f" + symbol + "&c˚&6₊ --- &3*&r\n"));
         //ChatUtils.send(player, ChatUtils.format("&bGuild&8: &6" + guild.getGuildName() + " &7(&3Lvl. &6" + guild.getLevel() + "&7)"));
-        if (showAll && guild.getGuildOptions().getNoticeboard() != null && !guild.getGuildOptions().getNoticeboard().equals("")) {
+        if (showAll && guild.getGuildOptions().getNoticeboard() != null && !guild.getGuildOptions().getNoticeboard().isEmpty()) {
             ChatUtils.send(player, ChatUtils.format(guild.getGuildOptions().getNoticeboard()));
         }
         ChatUtils.send(player, ChatUtils.format("&3&lGrandmaster&8: " + color + "&l" + guild.getLeader().getName()));

@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class GuildInviteCommandHandler extends GuildMemberPermissionCommandHandler {
 
-    public static List<Invite> INVITES = new ArrayList<>();
+    public static final List<Invite> INVITES = new ArrayList<>();
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
@@ -58,7 +58,7 @@ public class GuildInviteCommandHandler extends GuildMemberPermissionCommandHandl
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("invite");
+        return List.of("invite");
     }
 
     @Override

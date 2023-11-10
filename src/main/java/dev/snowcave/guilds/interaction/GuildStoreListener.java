@@ -66,7 +66,7 @@ public class GuildStoreListener implements Listener {
 
                     double modifier = user.get().getGuild().storeModifier();
                     if (FOOD.containsKey(food.getType())) {
-                        depositedFood += Math.floor(amount * FOOD.get(food.getType()) * modifier);
+                        depositedFood += (int) Math.floor(amount * FOOD.get(food.getType()) * modifier);
                     } else {
                         event.getPlayer().getInventory().addItem(food);
                     }

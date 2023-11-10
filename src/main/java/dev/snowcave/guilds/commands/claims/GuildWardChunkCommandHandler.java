@@ -61,7 +61,7 @@ public class GuildWardChunkCommandHandler extends GuildMemberPermissionBonusComm
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("ward");
+        return List.of("ward");
     }
 
     @Override

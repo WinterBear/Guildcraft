@@ -33,9 +33,7 @@ public class GuildAllianceCommandHandler extends GuildMemberPermissionCommandHan
     }
 
     //Create Alliance
-    private void handleCreation() {
 
-    }
 
     //Invite Guild to Alliance
 

@@ -4,6 +4,7 @@ import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.guildhalls.GuildHall;
+import dev.snowcave.guilds.utils.RepeatingTask;
 import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 public class GuildHallInteractionListener implements Listener {
 
     public static void start(JavaPlugin plugin) {
-        RepeatingTaskUtils.everyTick(10, GuildHallInteractionListener::areaOfEffect, plugin);
+        RepeatingTaskUtils.everyTick(10, new RepeatingTask("Guild Hall Area of Effect Task", GuildHallInteractionListener::areaOfEffect), plugin);
     }
 
     public static boolean areaOfEffect() {
@@ -96,8 +98,7 @@ public class GuildHallInteractionListener implements Listener {
                     }
 
                 } catch (IllegalArgumentException e) {
-                    ChatUtils.warn("An exception occured setting the players max health");
-                    e.printStackTrace();
+                    Bukkit.getLogger().log(Level.SEVERE, "An exception occured setting the players max health", e);
                     ChatUtils.warn("Player Health: " + playerHealth);
                     ChatUtils.warn("Player Max Health: " + playerMaxHealth);
                     ChatUtils.warn("Tried to set health to: " + (playerHealth + 1.0));
@@ -154,16 +155,6 @@ public class GuildHallInteractionListener implements Listener {
 
     private static Integer calculateHealthCooldown(Guild guild) {
         return 25 / guild.getRawLevel();
-    }
-
-    private static Optional<GuildHall> getGuildHall(Optional<Guild> fromGuild, Location from) {
-        Optional<GuildHall> fromHall;
-        if (fromGuild.isPresent()) {
-            fromHall = getHall(fromGuild.get(), from);
-        } else {
-            fromHall = Optional.empty();
-        }
-        return fromHall;
     }
 
     private static Optional<GuildHall> getHall(Guild guild, Location location) {

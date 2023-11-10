@@ -25,7 +25,6 @@ public class GuildViewLevelCommandHandler extends GuildMemberCommandHandler {
             int level = Integer.parseInt(arguments[1]);
             if (level > maxLevel) {
                 ChatUtils.send(player, "&cError - The maximum level is " + maxLevel);
-                return;
             } else {
                 ChatUtils.send(player, "&bGuild Bonuses&8: " + Levels.get(level).getGuildBonuses());
                 ChatUtils.send(player, "&bMax Chunks&8: &3" + Levels.get(level).getMaxChunks() + " &bMax Members&8: &3" + Levels.get(level).getMaxMembers());

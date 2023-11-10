@@ -46,7 +46,7 @@ public class GuildTopCommandHandler implements GuildCommandHandler {
                 return;
             }
         }
-        if (pages.size() > 0) {
+        if (!pages.isEmpty()) {
             int i = (partition * 8) + 1;
             for (Guild guild : pages.get(partition)) {
                 String symbol = guild.getGuildOptions().getGuildSymbol().getSymbol();

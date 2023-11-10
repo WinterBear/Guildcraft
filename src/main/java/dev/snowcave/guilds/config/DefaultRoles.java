@@ -50,7 +50,7 @@ public class DefaultRoles {
             GRAND_MASTER
     );
 
-    public static final List<Role> getDefaultRoles() {
+    public static List<Role> getDefaultRoles() {
         return new ArrayList<>(CORE_ROLES);
     }
 

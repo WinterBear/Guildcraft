@@ -28,10 +28,7 @@ public abstract class GuildLeaderCommandHandler implements GuildCommandHandler {
     @Override
     public boolean canUse(CommandSender sender) {
         Optional<Player> player = CommandSenderUtils.getPlayer(sender);
-        if (player.isPresent()) {
-            return Guilds.GUILDS.stream().anyMatch(g -> g.getLeader().getUuid().equals(player.get().getUniqueId()));
-        }
-        return false;
+        return player.filter(value -> Guilds.GUILDS.stream().anyMatch(g -> g.getLeader().getUuid().equals(value.getUniqueId()))).isPresent();
     }
 
 

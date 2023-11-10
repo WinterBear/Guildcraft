@@ -48,7 +48,7 @@ public class GuildKickCommandHandler extends GuildMemberPermissionCommandHandler
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("kick");
+        return List.of("kick");
     }
 
     @Override

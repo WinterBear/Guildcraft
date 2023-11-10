@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class LevelConfBuilder {
 
-    List<Level> levels = new ArrayList<>();
+    private final List<Level> levels = new ArrayList<>();
 
     private int currentLevel = 1;
 

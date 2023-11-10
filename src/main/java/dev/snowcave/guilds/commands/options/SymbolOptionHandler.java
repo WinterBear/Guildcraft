@@ -26,7 +26,7 @@ public class SymbolOptionHandler implements GuildOptionHandler {
             ChatUtils.send(player, "&7Available Symbols (Use /g o symbol <number> to set):");
             StringBuilder line = new StringBuilder();
             for (GuildSymbol symbol : GuildSymbol.values()) {
-                line.append("&3" + symbol.ordinal() + " &e" + symbol.getSymbol() + " ");
+                line.append("&3").append(symbol.ordinal()).append(" &e").append(symbol.getSymbol()).append(" ");
                 if (line.length() > 100) {
                     ChatUtils.send(player, line.toString());
                     line = new StringBuilder();
@@ -45,7 +45,7 @@ public class SymbolOptionHandler implements GuildOptionHandler {
         ChatUtils.send(player, "&7Available Symbols (Use /g o symbol <number> to set):");
         StringBuilder line = new StringBuilder();
         for (GuildSymbol symbol : GuildSymbol.values()) {
-            line.append("&3" + symbol.ordinal() + " &e" + symbol.getSymbol() + " ");
+            line.append("&3").append(symbol.ordinal()).append(" &e").append(symbol.getSymbol()).append(" ");
             if (line.length() > 100) {
                 ChatUtils.send(player, line.toString());
                 line = new StringBuilder();

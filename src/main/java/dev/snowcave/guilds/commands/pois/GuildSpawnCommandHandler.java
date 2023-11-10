@@ -16,7 +16,7 @@ public class GuildSpawnCommandHandler extends GuildMemberBonusCommandHandler {
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("spawn");
+        return List.of("spawn");
     }
 
     @Override
