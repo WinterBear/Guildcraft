@@ -2,7 +2,6 @@ package dev.snowcave.guilds.utils;
 
 import dev.snowcave.guilds.TestGuildCreator;
 import dev.snowcave.guilds.core.Guild;
-import junit.framework.TestCase;
 import org.bukkit.Chunk;
 import org.junit.Test;
 

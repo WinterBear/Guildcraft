@@ -3,7 +3,6 @@ package dev.snowcave.guilds.map;
 import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.ChunkStore;
 import org.junit.Test;
-import xyz.jpenilla.squaremap.api.Point;
 import xyz.jpenilla.squaremap.api.marker.MultiPolygon;
 
 import java.util.List;
