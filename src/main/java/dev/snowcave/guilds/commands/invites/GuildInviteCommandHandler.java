@@ -2,7 +2,6 @@ package dev.snowcave.guilds.commands.invites;
 
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
-import dev.snowcave.guilds.config.DefaultRoles;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
@@ -12,16 +11,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by WinterBear on 28/12/2020.
  */
 public class GuildInviteCommandHandler extends GuildMemberPermissionCommandHandler {
 
-    public static final List<Invite> INVITES = new ArrayList<>();
+    public static final HashMap<UUID, Set<Invite>> INVITES = new HashMap<>();
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
@@ -36,7 +33,8 @@ public class GuildInviteCommandHandler extends GuildMemberPermissionCommandHandl
                         ChatUtils.send(player, ChatUtils.format("&3That player is already part of a Guild."));
                         return;
                     }
-                    INVITES.add(new Invite(guild, new User(invitePlayer.getName(), invitePlayer.getUniqueId(), DefaultRoles.MEMBER)));
+                    INVITES.putIfAbsent(invitePlayer.getUniqueId(), new HashSet<>());
+                    INVITES.get(invitePlayer.getUniqueId()).add(new Invite(guild, invitePlayer.getUniqueId()));
                     ChatUtils.send(player, ChatUtils.format("&3Sent invite to &6" + invitePlayer.getName()));
                     if (invitePlayer.isOnline()) {
                         ChatUtils.send(invitePlayer.getPlayer(), ChatUtils.format("&b" + player.getName() + " &3has invited you to &6" + guild.getGuildName()));
