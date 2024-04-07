@@ -1,7 +1,6 @@
 package dev.snowcave.guilds.utils.conversations;
 
 import dev.snowcave.guilds.core.Guild;
-import dev.snowcave.guilds.core.users.User;
 
 import java.util.UUID;
 

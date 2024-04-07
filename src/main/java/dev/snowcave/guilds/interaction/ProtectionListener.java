@@ -14,15 +14,14 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Lectern;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.minecart.StorageMinecart;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.*;
 
 import java.util.*;
 
@@ -104,8 +103,8 @@ public class ProtectionListener implements Listener {
             Material.WARPED_PRESSURE_PLATE
     );
 
-    private boolean playerHasOverride(Player player) {
-        return player.hasPermission("guilds.admin");
+    private boolean playerHasOverride(Player player, Guild guild) {
+        return player.hasPermission("guilds.admin") || guild.playerIsAlly(player);
     }
 
     @EventHandler
@@ -113,11 +112,11 @@ public class ProtectionListener implements Listener {
         if (event.getRightClicked() instanceof ItemFrame
                 || event.getRightClicked() instanceof ArmorStand
                 || event.getRightClicked() instanceof Lectern
-                || event.getRightClicked() instanceof Minecart
+                || event.getRightClicked() instanceof StorageMinecart
                 || event.getRightClicked() instanceof Chest) {
             Optional<Guild> playerGuild = Guilds.getGuild(event.getPlayer());
             Optional<Guild> chunkGuild = ChunkUtils.getGuild(event.getPlayer().getLocation().getChunk());
-            if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer())) {
+            if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
                 event.setCancelled(true);
             }
         }
@@ -128,7 +127,7 @@ public class ProtectionListener implements Listener {
         Player player = event.getPlayer();
         Optional<Guild> playerGuild = Guilds.getGuild(player);
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(player.getLocation().getChunk());
-        if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer())) {
+        if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
             if (event.getAction().equals(Action.PHYSICAL) && event.getClickedBlock() != null) {
                 Material mat = event.getClickedBlock().getType();
                 if (CONTAINERS.contains(mat) || TOGGLEABLE.contains(mat) || PLATES.contains(mat)) {
@@ -136,6 +135,26 @@ public class ProtectionListener implements Listener {
                     event.setUseInteractedBlock(Event.Result.DENY);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onBucket(PlayerBucketEmptyEvent event){
+        Player player = event.getPlayer();
+        Optional<Guild> playerGuild = Guilds.getGuild(player);
+        Optional<Guild> chunkGuild = ChunkUtils.getGuild(player.getLocation().getChunk());
+        if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onBucket(PlayerBucketFillEvent event){
+        Player player = event.getPlayer();
+        Optional<Guild> playerGuild = Guilds.getGuild(player);
+        Optional<Guild> chunkGuild = ChunkUtils.getGuild(player.getLocation().getChunk());
+        if (chunkGuild.isPresent() && !chunkGuild.equals(playerGuild) && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
+            event.setCancelled(true);
         }
     }
 
@@ -160,7 +179,6 @@ public class ProtectionListener implements Listener {
                     entityEvent.setCancelled(true);
                 }
                 if (!attackerIsPlayer //If attacker is mob
-                        && victimGuild.equals(chunkGuild) //And victim was a member of the guild
                         && Levels.getAllGuildBonuses(victimGuild.get().getLevel()).contains(GuildBonus.MONSTER_WARD)) { //And the victim's guild has Monster Ward
                     entityEvent.setCancelled(true);
                 }
@@ -231,7 +249,7 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onPistonEvent(BlockPistonExtendEvent e) {
-        if (!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()) {
+        if (ChunkUtils.getGuild(e.getBlock().getChunk()).isEmpty()) {
             if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())) {
                 e.setCancelled(true);
             }
@@ -240,7 +258,7 @@ public class ProtectionListener implements Listener {
 
     @EventHandler
     public void onPistonEvent(BlockPistonRetractEvent e) {
-        if (!ChunkUtils.getGuild(e.getBlock().getChunk()).isPresent()) {
+        if (ChunkUtils.getGuild(e.getBlock().getChunk()).isEmpty()) {
             if (e.getBlocks().stream().anyMatch(b -> ChunkUtils.getGuild(b.getChunk()).isPresent())) {
                 e.setCancelled(true);
             }
@@ -254,10 +272,10 @@ public class ProtectionListener implements Listener {
             Optional<User> user = Guilds.getUser(event.getPlayer());
             if (user.isPresent()) {
                 Guild userGuild = user.get().getGuild();
-                if (!userGuild.equals(chunkGuild.get()) && !playerHasOverride(event.getPlayer())) {
+                if (!userGuild.equals(chunkGuild.get()) && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
                     event.setCancelled(true);
                 }
-            } else {
+            } else if (!playerHasOverride(event.getPlayer(), chunkGuild.get())) {
                 event.setCancelled(true);
             }
         }
@@ -266,14 +284,14 @@ public class ProtectionListener implements Listener {
     @EventHandler
     public void onPlace(BlockPlaceEvent event) {
         Optional<Guild> chunkGuild = ChunkUtils.getGuild(event.getBlock().getChunk());
-        if (chunkGuild.isPresent() && !playerHasOverride(event.getPlayer())) {
+        if (chunkGuild.isPresent() && !playerHasOverride(event.getPlayer(), chunkGuild.get())) {
             Optional<User> user = Guilds.getUser(event.getPlayer());
             if (user.isPresent()) {
                 Guild userGuild = user.get().getGuild();
                 if (!userGuild.equals(chunkGuild.get())) {
                     event.setCancelled(true);
                 }
-            } else {
+            } else if (!playerHasOverride(event.getPlayer(), chunkGuild.get())) {
                 event.setCancelled(true);
             }
         }

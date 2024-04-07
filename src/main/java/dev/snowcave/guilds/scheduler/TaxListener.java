@@ -3,6 +3,7 @@ package dev.snowcave.guilds.scheduler;
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.User;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.EconomyUtils;
 import dev.snowcave.guilds.utils.RepeatingTask;
 import dev.snowcave.guilds.utils.RepeatingTaskUtils;
@@ -27,7 +28,7 @@ public class TaxListener {
         if (!taxDoneForDay()) {
             Guilds.GUILDS.forEach(TaxListener::doTax);
             Guilds.GUILDS.forEach(TaxListener::doUpkeep);
-            Bukkit.broadcastMessage(ChatUtils.format("&bA new day is here. Guild Taxes and Upkeep have been taken."));
+            Chatter.broadcastP("A new day is here. Guild Taxes and Upkeep have been taken.");
         }
         return true;
     }

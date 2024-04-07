@@ -6,10 +6,12 @@ import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.guildhalls.GuildHallShape;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.ChunkUtils;
 import dev.snowcave.guilds.utils.LocationUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,18 +38,18 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
                 handleMove(player, user);
             } else if (arguments[1].equalsIgnoreCase("name")) {
                 if (arguments.length < 3) {
-                    ChatUtils.send(player, "&7You must specify a name.");
+                    Chatter.error(player, "You must specify a name.");
                 }
                 handleName(player, user, String.join(" ", Arrays.copyOfRange(arguments, 2, arguments.length)));
             } else if (arguments[1].equalsIgnoreCase("shape")) {
                 if (arguments.length < 3) {
-                    ChatUtils.send(player, "&7You must specify a shape - &acircle&7 or &bsquare.");
+                    Chatter.error(player, "You must specify a shape - &acircle&7 or &bsquare.");
                 } else {
                     handleShape(player, user, arguments[1]);
                 }
 
             } else {
-                ChatUtils.send(player, "&7Not a valid option. Options are &emove&7, &ename &7and &eshape&7.");
+                Chatter.error(player, "Not a valid option. Options are &emove&c, &ename &cand &eshape&c.");
             }
         }
     }
@@ -61,26 +63,26 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
         Optional<Guild> guildAtLocation = ChunkUtils.getGuild(player.getLocation().getChunk());
         if (guildAtLocation.isPresent() && user.getGuild().equals(guildAtLocation.get())) {
             user.getGuild().getGuildHall().setCenter(player.getLocation());
-            ChatUtils.send(player, "&3Moved Guild Hall to your current location.");
+            Chatter.sendP(player, "The Guild Hall was moved to your current location.");
         } else {
-            ChatUtils.send(player, "&7Error - Location is not within your Guilds territory.");
+            Chatter.error(player, "Location is not within your Guilds territory.");
         }
     }
 
     private void handleName(Player player, User user, String newName) {
         user.getGuild().getGuildHall().setName(newName);
-        ChatUtils.send(player, "&3Changed Guild Hall name to &b" + newName);
+        Chatter.sendP(player, "Changed Guild Hall name to &b" + newName);
     }
 
     private void handleShape(Player player, User user, String shape) {
         if (shape.equalsIgnoreCase("circle")) {
             user.getGuild().getGuildHall().setShape(GuildHallShape.CIRCLE);
-            ChatUtils.send(player, "&3Set Guild Hall shape to &6Circle");
+            Chatter.sendP(player, "Set Guild Hall shape to &6Circle");
         } else if (shape.equalsIgnoreCase("square")) {
             user.getGuild().getGuildHall().setShape(GuildHallShape.SQUARE);
-            ChatUtils.send(player, "&3Set Guild Hall shape to &6Square");
+            Chatter.sendP(player, "Set Guild Hall shape to &6Square");
         } else {
-            ChatUtils.send(player, "&b/g hall shape &e<&aCircle&8/&cSquare&e> &8- &7Change the shape of your Guild Hall's area of effect &7(&6" + user.getGuild().getGuildHall().getShape() + "&7)");
+            Chatter.send(player, "&b/g hall shape &e<&aCircle&8/&cSquare&e> &8- &7Change the shape of your Guild Hall's area of effect &7(&6" + user.getGuild().getGuildHall().getShape() + "&7)");
         }
     }
 
@@ -95,7 +97,7 @@ public class GuildHallCommandHandler extends GuildMemberPermissionBonusCommandHa
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild hall &8- &7View and edit Guild Hall options.";
     }
 }

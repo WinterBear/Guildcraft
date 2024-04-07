@@ -1,7 +1,7 @@
 package dev.snowcave.guilds.commands.options;
 
 import dev.snowcave.guilds.core.Guild;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,13 +12,13 @@ public class TaxKickOptionHandler extends OnOffGuildOptionHandler {
     @Override
     public void enable(Guild guild, Player player) {
         guild.getGuildOptions().setKickMembersWhoDontPayTax(true);
-        ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &cwill be kicked &7from the guild.");
+        Chatter.sendP(player, "&7Players who do not have enough funds to pay taxes each day &cwill be kicked &7from the guild.");
     }
 
     @Override
     public void disable(Guild guild, Player player) {
         guild.getGuildOptions().setKickMembersWhoDontPayTax(false);
-        ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &awill not be kicked &7from the guild.");
+        Chatter.sendP(player, "&7Players who do not have enough funds to pay taxes each day &awill not be kicked &7from the guild.");
     }
 
     @Override
@@ -27,11 +27,11 @@ public class TaxKickOptionHandler extends OnOffGuildOptionHandler {
     }
 
     @Override
-    public void displayValue(Guild guild, Player player) {
+    public void handleNoArgs(Guild guild, Player player) {
         if (guild.getGuildOptions().isKickMembersWhoDontPayTax()) {
-            ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &awill be kicked &7from the guild.");
+            Chatter.sendP(player, "&7Players who do not have enough funds to pay taxes each day &awill be kicked &7from the guild.");
         } else {
-            ChatUtils.send(player, "&7Players who do not have enough funds to pay taxes each day &cwill not be kicked &7from the guild.");
+            Chatter.sendP(player, "&7Players who do not have enough funds to pay taxes each day &cwill not be kicked &7from the guild.");
         }
     }
 }

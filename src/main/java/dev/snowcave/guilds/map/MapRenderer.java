@@ -1,9 +1,13 @@
 package dev.snowcave.guilds.map;
 
+import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.ChunkStore;
 import dev.snowcave.guilds.core.Guild;
+import dev.snowcave.guilds.utils.RepeatingTask;
+import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 import xyz.jpenilla.squaremap.api.Point;
 import xyz.jpenilla.squaremap.api.*;
 import xyz.jpenilla.squaremap.api.marker.MarkerOptions;
@@ -27,20 +31,32 @@ public class MapRenderer {
 
     private static final HashMap<String, SimpleLayerProvider> LAYER_PROVIDERS = new HashMap<>();
 
-    public static void enable(List<String> worlds) {
+    public static void enable(List<String> worlds, JavaPlugin plugin) {
+        RepeatingTaskUtils.everySeconds(30, new RepeatingTask("Guild Map Render Task", () -> renderWorlds(worlds)), plugin);
+
+    }
+
+    private static boolean renderWorlds(List<String> worlds){
         if (getServer().getPluginManager().getPlugin("squaremap") != null) {
             mapEnabled = true;
 
             for (String world : worlds){
-                WorldIdentifier identifier = BukkitAdapter.worldIdentifier(Objects.requireNonNull(Bukkit.getWorld(world)));
-                MapWorld mapWorld = SquaremapProvider.get().getWorldIfEnabled(identifier).orElse(null);
-                SimpleLayerProvider layerProvider = getLayerProvider("guilds");
-                assert mapWorld != null;
-                mapWorld.layerRegistry().register(Key.of("guilds"), layerProvider);
-                LAYER_PROVIDERS.put(world, layerProvider);
+                try {
+                    WorldIdentifier identifier = BukkitAdapter.worldIdentifier(Objects.requireNonNull(Bukkit.getWorld(world)));
+                    MapWorld mapWorld = SquaremapProvider.get().getWorldIfEnabled(identifier).orElse(null);
+                    SimpleLayerProvider layerProvider = getLayerProvider("guilds");
+                    assert mapWorld != null;
+                    mapWorld.layerRegistry().register(Key.of("guilds"), layerProvider);
+                    LAYER_PROVIDERS.put(world, layerProvider);
+                    Guilds.GUILDS.forEach(g -> renderGuild(String.valueOf(g.hashCode()), g));
+                } catch (IllegalStateException exception) {
+                    Bukkit.getLogger().severe("Squaremap API Could not retrieve MapWorld for world " + world);
+                    return true;
+                }
             }
-
         }
+        Bukkit.getLogger().info("Squaremap API rendering complete");
+        return false;
     }
 
     private static SimpleLayerProvider getLayerProvider(String label) {
@@ -65,7 +81,7 @@ public class MapRenderer {
 
     private static MultiPolygon getPolygon(Guild guild, String world) {
         ChunkStore mainChunks = guild.getChunks();
-        Collection<ChunkStore> outpostChunks = guild.getOutposts().values();
+        Collection<ChunkStore> outpostChunks = new ArrayList<>(guild.getOutposts().values());
 
         List<MultiPolygon.MultiPolygonPart> parts = getPolygon(mainChunks, world);
         outpostChunks.forEach(c -> parts.addAll(getPolygon(c, world)));

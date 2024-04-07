@@ -3,10 +3,10 @@ package dev.snowcave.guilds.commands.pois;
 import dev.snowcave.guilds.commands.base.GuildMemberBonusCommandHandler;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,14 +20,14 @@ public class GuildSpawnCommandHandler extends GuildMemberBonusCommandHandler {
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild spawn &8- &7Teleport to your guilds spawn.";
     }
 
     @Override
     public void handleWithBonus(Player player, User user, String[] arguments) {
         player.teleport(user.getGuild().getSpawnLocation());
-        ChatUtils.send(player, ChatUtils.format("&7Teleporting to spawn."));
+        Chatter.sendP(player, "Teleporting to spawn.");
     }
 
     @Override

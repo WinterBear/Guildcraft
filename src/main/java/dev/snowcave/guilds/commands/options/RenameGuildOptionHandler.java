@@ -1,7 +1,9 @@
 package dev.snowcave.guilds.commands.options;
 
 import dev.snowcave.guilds.Guilds;
+import dev.snowcave.guilds.commands.general.GuildSubcommandHandler;
 import dev.snowcave.guilds.core.Guild;
+import dev.snowcave.guilds.utils.Chatter;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -9,7 +11,7 @@ import org.bukkit.entity.Player;
 /**
  * Created by WinterBear on 20/01/2021.
  */
-public class RenameGuildOptionHandler implements GuildOptionHandler {
+public class RenameGuildOptionHandler implements GuildSubcommandHandler {
 
     @Override
     public String getKeyword() {
@@ -17,9 +19,9 @@ public class RenameGuildOptionHandler implements GuildOptionHandler {
     }
 
     @Override
-    public void setValue(Guild guild, Player player, String argument) {
+    public void handle(Guild guild, Player player, String argument) {
         if (Guilds.getGuild(argument).isPresent()) {
-            ChatUtils.send(player, "&3There is already a Guild called " + argument);
+            Chatter.error(player, "&3There is already a Guild called " + argument);
         } else {
             String oldName = guild.getGuildName();
             guild.setGuildName(argument);
@@ -28,7 +30,7 @@ public class RenameGuildOptionHandler implements GuildOptionHandler {
     }
 
     @Override
-    public void displayValue(Guild guild, Player player) {
-        ChatUtils.send(player, "&b/g options public &e<&aon&8/&coff&e> &8- &7Allow anyone to join your guild. &8(&6" + guild.getGuildName() + "&8)");
+    public void handleNoArgs(Guild guild, Player player) {
+        Chatter.send(player, "&b/g options public &e<&aon&8/&coff&e> &8- &7Allow anyone to join your guild. &8(&6" + guild.getGuildName() + "&8)");
     }
 }

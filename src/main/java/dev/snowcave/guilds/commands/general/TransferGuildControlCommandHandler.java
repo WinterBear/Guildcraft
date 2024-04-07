@@ -2,8 +2,9 @@ package dev.snowcave.guilds.commands.general;
 
 import dev.snowcave.guilds.commands.base.GuildLeaderCommandHandler;
 import dev.snowcave.guilds.core.users.User;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ public class TransferGuildControlCommandHandler extends GuildLeaderCommandHandle
 
     @Override
     public void handle(Player player, User user, String[] arguments) {
+        Chatter chatter = new Chatter(player);
         if (arguments.length > 1) {
             String transferTo = arguments[1];
             Optional<User> member = user.getGuild().getMembers().stream().filter(u -> u.getName().equals(transferTo)).findAny();
@@ -24,10 +26,10 @@ public class TransferGuildControlCommandHandler extends GuildLeaderCommandHandle
                 user.getGuild().setLeader(member.get());
                 user.getGuild().broadcast("&3Guild control has been transferred to &6" + member.get().getName());
             } else {
-                ChatUtils.send(player, "&7You may only transfer control to a member of your Guild.");
+                chatter.error("You may only transfer control to a member of your Guild.");
             }
         } else {
-            ChatUtils.send(player, describe());
+            chatter.send(describe());
         }
 
     }
@@ -38,7 +40,7 @@ public class TransferGuildControlCommandHandler extends GuildLeaderCommandHandle
     }
 
     @Override
-    public String describe() {
-        return "&b/guild transfer &e<&6member&e> &8- &7Transfer Guild leadership";
+    public @NotNull String describe() {
+        return "&b/guild transfer &e<&6Member&e> &8- &7Transfer Guild leadership";
     }
 }

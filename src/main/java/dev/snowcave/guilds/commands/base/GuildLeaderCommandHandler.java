@@ -2,8 +2,8 @@ package dev.snowcave.guilds.commands.base;
 
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.users.User;
+import dev.snowcave.guilds.utils.CommandSenderUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
-import io.github.winterbear.WinterCoreUtils.CommandSenderUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,8 +27,7 @@ public abstract class GuildLeaderCommandHandler implements GuildCommandHandler {
 
     @Override
     public boolean canUse(CommandSender sender) {
-        Optional<Player> player = CommandSenderUtils.getPlayer(sender);
-        return player.filter(value -> Guilds.GUILDS.stream().anyMatch(g -> g.getLeader().getUuid().equals(value.getUniqueId()))).isPresent();
+        return CommandSenderUtils.isGuildLeader(sender);
     }
 
 

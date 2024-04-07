@@ -6,12 +6,16 @@ import dev.snowcave.guilds.config.Levels;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
+import dev.snowcave.guilds.utils.Chatter;
+import dev.snowcave.guilds.utils.TabCompleteUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,12 +33,13 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild info &8- &7Display information about your Guild";
     }
 
     @Override
     public void handle(Player player, User user, String[] arguments) {
+        Chatter chatter = new Chatter(player);
 
         if (arguments.length > 1) {
             String guildName = String.join(" ", Arrays.copyOfRange(arguments, 1, arguments.length));
@@ -42,7 +47,7 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
             if (guild.isPresent()) {
                 showGuildInfo(player, guild.get(), player.hasPermission("guilds.admin"));
             } else {
-                ChatUtils.send(player, "&7Could not find a guild by that name.");
+                chatter.error("&7Could not find a guild by that name.");
             }
         } else {
             showGuildInfo(player, user.getGuild(), true);
@@ -78,12 +83,14 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
             for (String outpost : guild.getOutposts().keySet()) {
                 ChatUtils.send(player, ChatUtils.format("&7- &3") + outpost + " &8(&a" + guild.getOutposts().get(outpost).getChunkReferences().size() + " chunks claimed&8)");
             }
-            guild.initOutposts();
+        }
+        if (showAll && guild.getAllies().size() > 0){
+            ChatUtils.send(player, ChatUtils.format("&3Allies&8: &b" + guild.getAllies().values().stream().collect(Collectors.joining("&7, &b"))));
         }
         if (showAll) {
             ChatUtils.send(player, "");
             if (!Levels.getAllGuildBonuses(guild.getLevel()).isEmpty()) {
-                TextComponent text = new TextComponent(ChatUtils.format("&6Bonuses&8: &e"));
+                TextComponent text = new TextComponent(ChatUtils.format("&6Bonuses &8(&7Mouseover for descriptions&8)&8: &e"));
                 for (GuildBonus bonus : Levels.getAllGuildBonuses(guild.getLevel())) {
                     text.addExtra(coloredTextComponent(ChatColor.DARK_GRAY, "["));
                     text.addExtra(bonusDisplay(ChatColor.of("#52a8ff"), ChatUtils.format(bonus.getSymbol()), ChatUtils.format(bonus.toString())));
@@ -107,6 +114,13 @@ public class GuildInfoCommandHandler extends GuildMemberCommandHandler {
         message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(hover)));
         return message;
     }
+
+    @Override
+    public List<String> getTabCompletions(CommandSender sender, String[] arguments) {
+        return TabCompleteUtils.doMultiwordTabComplete(arguments, 2, Guilds.GUILDS.stream().map(Guild::getGuildName).collect(Collectors.toList()));
+    }
+
+
 
 
 }

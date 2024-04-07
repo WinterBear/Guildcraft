@@ -10,6 +10,11 @@ import java.util.EnumSet;
  */
 public class EntityTypeUtils {
 
+    public static final EnumSet<EntityType> TRADER_ENTITIES = EnumSet.of(
+            EntityType.TRADER_LLAMA,
+            EntityType.WANDERING_TRADER
+    );
+
     public static final EnumSet<EntityType> HOSTILE_ENTITIES = EnumSet.of(
             EntityType.CREEPER,
             EntityType.ENDERMITE,

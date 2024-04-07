@@ -1,8 +1,8 @@
 package dev.snowcave.guilds.commands.base;
 
 import dev.snowcave.guilds.Guilds;
+import dev.snowcave.guilds.commands.GuildCommand;
 import dev.snowcave.guilds.core.users.User;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import io.github.winterbear.WinterCoreUtils.CommandSenderUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,12 +15,7 @@ import java.util.Optional;
 public abstract class GuildMemberCommandHandler implements GuildCommandHandler {
 
     public void handle(Player player, String[] arguments) {
-        Optional<User> user = Guilds.getUser(player);
-        if (user.isPresent()) {
-            handle(player, user.get(), arguments);
-        } else {
-            ChatUtils.send(player, "&7You do not have a guild.");
-        }
+        GuildCommand.asGuildUser(this::handle, player, arguments);
     }
 
     public abstract void handle(Player player, User user, String[] arguments);

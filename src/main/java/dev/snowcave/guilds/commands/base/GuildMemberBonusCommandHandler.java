@@ -1,15 +1,12 @@
 package dev.snowcave.guilds.commands.base;
 
-import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.config.Levels;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
+import dev.snowcave.guilds.utils.CommandSenderUtils;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
-import io.github.winterbear.WinterCoreUtils.CommandSenderUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Optional;
 
 /**
  * Created by WinterBear on 29/12/2020.
@@ -31,13 +28,6 @@ public abstract class GuildMemberBonusCommandHandler extends GuildMemberCommandH
 
     @Override
     public boolean canUse(CommandSender sender) {
-        Optional<Player> player = CommandSenderUtils.getPlayer(sender);
-        if (player.isPresent()) {
-            Optional<User> user = Guilds.getUser(player.get());
-            if (user.isPresent()) {
-                return Levels.getAllGuildBonuses(user.get().getGuild().getLevel()).contains(getBonus());
-            }
-        }
-        return false;
+        return CommandSenderUtils.guildHasBonus(sender, getBonus());
     }
 }

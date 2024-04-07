@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.commands.base.GuildCommandHandler;
 import dev.snowcave.guilds.core.Guild;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,12 +26,13 @@ public class GuildTopCommandHandler implements GuildCommandHandler {
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild top &e<&6Page&e> &8- &7View top Guilds on the server";
     }
 
     @Override
     public void handle(Player player, String[] arguments) {
+        Chatter chatter = new Chatter(player);
         int partition = 0;
         List<Guild> sortedGuilds = new ArrayList<>(Guilds.GUILDS);
         sortedGuilds.sort(Comparator.comparing(Guild::getRawLevel).thenComparing(Guild::getBalance).reversed());
@@ -38,11 +41,11 @@ public class GuildTopCommandHandler implements GuildCommandHandler {
             try {
                 partition = Integer.parseInt(arguments[1]) - 1;
                 if (partition > pages.size() - 1) {
-                    ChatUtils.send(player, "&cError &8- &7Invalid argument \"" + partition + "\". Must be a number between 1 and " + pages.size());
+                    chatter.error("Invalid argument \"" + partition + "\". Must be a number between 1 and " + pages.size());
                     return;
                 }
             } catch (NumberFormatException numberFormatException) {
-                ChatUtils.send(player, "&cError &8- &7Invalid argument \"" + partition + "\". Must be a number between 1 and " + (pages.size() - 1));
+                chatter.error("Invalid argument \"" + partition + "\". Must be a number between 1 and " + (pages.size() - 1));
                 return;
             }
         }
@@ -52,10 +55,12 @@ public class GuildTopCommandHandler implements GuildCommandHandler {
                 String symbol = guild.getGuildOptions().getGuildSymbol().getSymbol();
                 String name = guild.getGuildName();
                 ChatColor color = ChatColor.of(guild.getGuildOptions().getColor());
-                ChatUtils.send(player, "&6" + i++ + " &f" + symbol + " &3" + color + name + " &7- &b" + guild.getMembers().size() + " Members" + " &8[&eLevel&7: &b" + guild.getRawLevel() + " &eMoney&7: &b" + guild.getBalance() + "&8]");
+                chatter.send("&6" + i++ + " &f" + symbol + " &3" + color + name + " &7- &b"
+                        + guild.getMembers().size() + " Members" + " &8[&eLevel&7: &b" + guild.getRawLevel()
+                        + " &eMoney&7: &b" + new DecimalFormat("0.00").format(guild.getBalance()) + "&8]");
             }
         } else {
-            ChatUtils.send(player, "&3No guilds exist.");
+            chatter.error("&cNo guilds exist.");
         }
 
     }

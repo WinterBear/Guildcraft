@@ -12,7 +12,7 @@ public class Role {
 
     private String title;
 
-    private List<GuildPermission> permissions;
+    private List<GuildPermission> permissions = new ArrayList<>();
 
     public Role() {
 

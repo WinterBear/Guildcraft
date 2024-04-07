@@ -31,6 +31,8 @@ public class GuildOptions {
 
     private String color;
 
+    private boolean tradersBanned;
+
     public GuildOptions() {
         //Default Constructor
     }
@@ -49,6 +51,7 @@ public class GuildOptions {
         this.guildTag = generateGuildTag(guild.getGuildName());
         this.isPublic = false;
         this.color = "#5e9cff";
+        this.tradersBanned = false;
     }
 
     private String generateGuildTag(String guildName) {
@@ -109,6 +112,10 @@ public class GuildOptions {
         return isPublic;
     }
 
+    public boolean isTradersBanned() {
+        return tradersBanned;
+    }
+
     public void setExplosionsEnabled(boolean explosionsEnabled) {
         this.explosionsEnabled = explosionsEnabled;
     }
@@ -163,5 +170,9 @@ public class GuildOptions {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public void setTradersBanned(boolean tradersBanned) {
+        this.tradersBanned = tradersBanned;
     }
 }

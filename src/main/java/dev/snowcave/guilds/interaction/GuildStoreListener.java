@@ -2,7 +2,7 @@ package dev.snowcave.guilds.interaction;
 
 import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.users.User;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -73,7 +73,7 @@ public class GuildStoreListener implements Listener {
                 }
             }
             user.get().getGuild().getGuildHall().addFood(depositedFood);
-            ChatUtils.send((Player) event.getPlayer(), "&7Deposited &a+" + depositedFood + " &7food into the guild stores. &e(&6Total&8: &2" + user.get().getGuild().getGuildHall().getFoodStore() + "&e)");
+            Chatter.sendP((Player) event.getPlayer(), "&7Deposited &a+" + depositedFood + " &7food into the guild stores. &e(&6Total&8: &2" + user.get().getGuild().getGuildHall().getFoodStore() + "&e)");
             OPEN_STORES.remove(event.getPlayer().getUniqueId());
         }
     }
