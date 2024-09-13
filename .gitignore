@@ -22,6 +22,7 @@ target/*
 /.gradle/buildOutputCleanup/cache.properties
 /.gradle/buildOutputCleanup/outputFiles.bin
 /.gradle/vcs-1/gc.properties
+build/tmp
 /build/classes/java/main/dev/snowcave/guilds/core/alliances/Alliance.class
 /build/classes/java/main/dev/snowcave/guilds/core/alliances/Alliances.class
 /build/classes/java/main/dev/snowcave/guilds/core/alliances/AllianceType.class
