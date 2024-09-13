@@ -15,14 +15,14 @@ public class GuildAura {
     public void doAura() {
         Bukkit.getOnlinePlayers()
                 .stream()
-                .filter(this::eligable)
+                .filter(this::eligible)
                 .filter(player -> player.getWorld().getPlayers().stream()
                         .filter(p -> sameGuild(player, p))
                         .anyMatch(p -> p.getLocation().distance(player.getLocation()) < 10))
                 .forEach(this::doAura);
     }
 
-    private boolean eligable(Player player){
+    private boolean eligible(Player player){
         return Guilds.getUser(player).isPresent() && Levels.getAllGuildBonuses(Guilds.getUser(player).get().getGuild().getLevel()).contains(GuildBonus.GUILD_AURA_1);
     }
 

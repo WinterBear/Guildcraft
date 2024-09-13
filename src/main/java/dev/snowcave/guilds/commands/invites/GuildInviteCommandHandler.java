@@ -7,7 +7,6 @@ import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
 import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.conversations.Invite;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

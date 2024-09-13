@@ -6,4 +6,5 @@ package dev.snowcave.guilds.commands.alliances;
 public class GuildAllianceCapitalCommandHandler {
 
 
+
 }

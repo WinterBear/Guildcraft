@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class DelayedTaskScheduler {
 
-    private JavaPlugin plugin;
+    private final JavaPlugin plugin;
 
     public DelayedTaskScheduler(JavaPlugin plugin) {
         this.plugin = plugin;

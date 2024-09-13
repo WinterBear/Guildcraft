@@ -8,7 +8,6 @@ import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.CommandSenderUtils;
 import dev.snowcave.guilds.utils.EconomyUtils;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

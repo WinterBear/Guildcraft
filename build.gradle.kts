@@ -81,7 +81,7 @@ tasks.withType<JavaCompile> {
 }
 
 group = "dev.snowcave.winterbear"
-version = "1.2.3-SNAPSHOT"
+version = "1.3.0-SNAPSHOT"
 description = "Guilds"
 java.sourceCompatibility = JavaVersion.VERSION_17
 

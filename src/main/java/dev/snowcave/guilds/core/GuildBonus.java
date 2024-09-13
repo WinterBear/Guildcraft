@@ -92,6 +92,6 @@ public enum GuildBonus {
 
     @Override
     public String toString() {
-        return ChatColor.of("#52a8ff") + displayName + " &8- &e" + description + "&8";
+        return ChatColor.of("#52a8ff") + getDisplayName() + " &8- &e" + getDescription() + "&8";
     }
 }

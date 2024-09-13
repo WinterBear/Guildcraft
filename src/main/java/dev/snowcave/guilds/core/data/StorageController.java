@@ -130,7 +130,7 @@ public class StorageController {
     }
 
     public static void backup(Path backupDir, Path filePath) {
-        Chatter.infoConsole("Backing up " + filePath + " to " + backupDir);
+        //Chatter.infoConsole("Backing up " + filePath + " to " + backupDir);
         try {
             Path destination = Paths.get(backupDir.toString(), filePath.getFileName().toString());
             Files.move(filePath, destination);
@@ -158,8 +158,8 @@ public class StorageController {
     private static void loadGuild(Path filePath) {
 
         Chatter.infoConsole("Loading Guild " + filePath);
-        try {
-            String json = Files.lines(filePath).collect(Collectors.joining());
+        try (Stream<String> lines = Files.lines(filePath)) {
+            String json = lines.collect(Collectors.joining());
             Guild guild = MAPPER.readValue(json, Guild.class);
             Guilds.GUILDS.add(guild);
         } catch (IOException e) {
@@ -170,8 +170,8 @@ public class StorageController {
     private static void loadAlliance(Path filePath) {
 
         Chatter.infoConsole("Loading Alliance " + filePath);
-        try {
-            String json = Files.lines(filePath).collect(Collectors.joining());
+        try (Stream<String> lines = Files.lines(filePath)) {
+            String json = lines.collect(Collectors.joining());
             Alliance alliance = MAPPER.readValue(json, Alliance.class);
             Guilds.ALLIANCES.put(alliance.getName(), alliance);
         } catch (IOException e) {

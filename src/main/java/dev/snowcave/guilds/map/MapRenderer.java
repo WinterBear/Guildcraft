@@ -4,6 +4,7 @@ import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.ChunkStore;
 import dev.snowcave.guilds.core.Guild;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.RepeatingTask;
 import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import org.bukkit.Bukkit;
@@ -69,6 +70,7 @@ public class MapRenderer {
     }
 
     public static void renderGuild(String markerKey, Guild guild) {
+        Chatter.infoConsole("Rendering Guild " + guild.getGuildName());
         if (mapEnabled) {
             for (String world : LAYER_PROVIDERS.keySet()){
                 MultiPolygon multiPolygon = getPolygon(guild, world);
@@ -84,7 +86,10 @@ public class MapRenderer {
         Collection<ChunkStore> outpostChunks = new ArrayList<>(guild.getOutposts().values());
 
         List<MultiPolygon.MultiPolygonPart> parts = getPolygon(mainChunks, world);
-        outpostChunks.forEach(c -> parts.addAll(getPolygon(c, world)));
+        outpostChunks.stream()
+
+                .filter(p -> p.getChunkReferences().stream().allMatch(c -> c.getWorldRef().equals(world)))
+                .forEach(c -> parts.addAll(getPolygon(c, world)));
 
         return MultiPolygon.multiPolygon(parts);
     }
@@ -105,6 +110,10 @@ public class MapRenderer {
     }
 
     public static List<MultiPolygon.MultiPolygonPart> getPolygon(ChunkStore store, String world) {
+
+        if(store.getChunkReferences().isEmpty() || !store.getChunkReferences().stream().findFirst().get().getWorldRef().equals(world)){
+            return new ArrayList<>();
+        }
 
         ChunkReference rightMostBlock = findRightMost(store, world);
 

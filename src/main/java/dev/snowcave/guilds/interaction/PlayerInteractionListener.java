@@ -43,13 +43,15 @@ public class PlayerInteractionListener implements Listener {
             Optional<Guild> toGuild = ChunkUtils.getGuild(toChunk);
             Optional<Guild> fromGuild = ChunkUtils.getGuild(fromChunk);
 
-            if (toGuild.isPresent()) {
-                if (fromGuild.isEmpty() || !fromGuild.get().equals(toGuild.get())) {
+            if (toGuild.isPresent()) { // To Chunk is inside a Guild
+                if (fromGuild.isEmpty() || !fromGuild.get().equals(toGuild.get())) { // Either we are entering a Guild from the wilderness or moving from one guild to another
                     Optional<String> outpost = ChunkUtils.getChunkOutpost(toGuild.get(), toChunk);
                     Optional<User> user = Guilds.getUser(player);
                     if(user.isPresent()){
-                        if (Levels.getAllGuildBonuses(user.get().getGuild().getLevel()).contains(GuildBonus.FLIGHT)){
+                        if (user.get().getGuild().equals(toGuild.get()) && Levels.getAllGuildBonuses(user.get().getGuild().getLevel()).contains(GuildBonus.FLIGHT)){
                             player.setAllowFlight(true);
+                        } else if (fromGuild.isPresent() && player.getAllowFlight() && !player.hasPermission("essentials.fly")) {
+                            player.setAllowFlight(false);
                         }
                     }
                     if (outpost.isEmpty()) {
@@ -58,7 +60,8 @@ public class PlayerInteractionListener implements Listener {
                         sentGuildOutpostWelcomeTitle(toGuild.get(), player, outpost.get());
                     }
                 }
-            } else if (fromGuild.isPresent()) {
+
+            } else if (fromGuild.isPresent()) { // Leaving a Guild
                 sendWildernessTitle(player, destination);
                 if(player.getAllowFlight() && !player.hasPermission("essentials.fly")){
                     player.setAllowFlight(false);
