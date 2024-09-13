@@ -19,7 +19,9 @@ public enum GuildPermission {
     ROLES("Roles", "Allows the user to manage guild roles."),
     INHERIT("Inherit", "Users with this permission will be considered first if the guild leader leaves without nominating someone."),
     MOVE_SPAWN("Move Spawn", "Allows the user to move the guild spawn."),
-    GUILDHALL("Guild Hall", "Allows the user to manage the guild hall.");
+    GUILDHALL("Guild Hall", "Allows the user to manage the guild hall."),
+    LEADER("Leader", "Only the leader of the Guild can use this role"),
+    ALLIES("Allies", "Allows the user to manage the guilds allies.");
 
     private final String displayName;
 

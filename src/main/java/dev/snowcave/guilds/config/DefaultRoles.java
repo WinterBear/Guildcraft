@@ -23,7 +23,8 @@ public class DefaultRoles {
             .addPermission(GuildPermission.DEPOSIT)
             .addPermission(GuildPermission.INHERIT)
             .addPermission(GuildPermission.MOVE_SPAWN)
-            .addPermission(GuildPermission.GUILDHALL);
+            .addPermission(GuildPermission.GUILDHALL)
+            .addPermission(GuildPermission.LEADER);
 
     public static final Role MASTER = new Role("Master")
             .addPermission(GuildPermission.CLAIM)
@@ -50,7 +51,7 @@ public class DefaultRoles {
             GRAND_MASTER
     );
 
-    public static final List<Role> getDefaultRoles() {
+    public static List<Role> getDefaultRoles() {
         return new ArrayList<>(CORE_ROLES);
     }
 

@@ -6,10 +6,11 @@ import dev.snowcave.guilds.config.Levels;
 import dev.snowcave.guilds.core.guildhalls.GuildHall;
 import dev.snowcave.guilds.core.users.Role;
 import dev.snowcave.guilds.core.users.User;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -25,6 +26,8 @@ public class Guild {
 
     private List<User> members = new ArrayList<>();
 
+    private Map<String, String> allies = new HashMap<>();
+
     private int level = 1;
 
     private final ChunkStore chunks = new ChunkStore();
@@ -37,9 +40,11 @@ public class Guild {
 
     private List<Role> roles;
 
-    private Map<String, ChunkStore> outposts = new HashMap<>();
+    private Map<String, Outpost> outposts = new HashMap<>();
 
     private GuildHall guildHall;
+
+    private String alliance;
 
     public Guild() {
 
@@ -67,11 +72,19 @@ public class Guild {
         return leader;
     }
 
+
     public Optional<User> getMember(Player player) {
         return members.stream()
                 .filter(u -> u.getUuid().equals(player.getUniqueId()))
                 .findFirst();
     }
+
+    public Optional<User> getMember(UUID uuid) {
+        return members.stream()
+                .filter(u -> u.getUuid().equals(uuid))
+                .findFirst();
+    }
+
 
     public void setLeader(User leader) {
         this.leader = leader;
@@ -109,7 +122,16 @@ public class Guild {
 
     @JsonIgnore
     public Optional<ChunkReference> getChunkRef(Chunk chunk){
-        return chunks.get(chunk);
+        Optional<ChunkReference> chunkRef = chunks.get(chunk);
+        if (!chunkRef.isPresent()){
+            for (ChunkStore outpost : outposts.values()){
+                chunkRef = outpost.get(chunk);
+                if(chunkRef.isPresent()){
+                    return chunkRef;
+                }
+            }
+        }
+        return chunkRef;
     }
 
     public List<ChunkReference> allChunks() {
@@ -143,11 +165,12 @@ public class Guild {
         return chunkReference;
     }
 
-    public ChunkReference createNewOutpost(String outpostRef, Chunk spawnChunk) {
+    public ChunkReference createNewOutpost(Location tp, String outpostRef, Chunk spawnChunk) {
         ChunkReference chunkReference = new ChunkReference(spawnChunk);
         if (!outposts.containsKey(outpostRef)) {
-            outposts.put(outpostRef, new ChunkStore());
+            outposts.put(outpostRef, new Outpost());
             outposts.get(outpostRef).addChunk(chunkReference);
+            outposts.get(outpostRef).setWarppointLocation(tp);
             return chunkReference;
         } else {
             return null;
@@ -200,6 +223,10 @@ public class Guild {
         return members.stream().anyMatch(u -> u.getUuid().equals(player.getUniqueId()));
     }
 
+    public boolean hasMember(UUID uuid) {
+        return members.stream().anyMatch(u -> u.getUuid().equals(uuid));
+    }
+
     @JsonIgnore
     public boolean isPublic() {
         return guildOptions.isPublic();
@@ -209,7 +236,7 @@ public class Guild {
         for (User user : members) {
             Player player = Bukkit.getPlayer(user.getUuid());
             if (player != null && player.isOnline()) {
-                ChatUtils.send(player, ChatUtils.format(message));
+                Chatter.send(player, message);
             }
         }
     }
@@ -269,7 +296,7 @@ public class Guild {
         }
     }
 
-    public Map<String, ChunkStore> getOutposts() {
+    public Map<String, Outpost> getOutposts() {
         return outposts;
     }
 
@@ -289,7 +316,35 @@ public class Guild {
         }
     }
 
-    public void setOutposts(Map<String, ChunkStore> outposts) {
+    public void setOutposts(Map<String, Outpost> outposts) {
         this.outposts = outposts;
+    }
+
+    public boolean playerIsAlly(Player player){
+        return allies.containsKey(player.getUniqueId().toString());
+    }
+
+    public boolean playerIsAlly(OfflinePlayer player){
+        return allies.containsKey(player.getUniqueId().toString());
+    }
+
+    public void addAlly(String name, UUID uuid){
+        allies.put(uuid.toString(), name);
+    }
+
+    public void removeAlly(UUID uuid){
+        allies.remove(uuid.toString());
+    }
+
+    public Map<String, String> getAllies() {
+        return allies;
+    }
+
+    public String getAlliance() {
+        return alliance;
+    }
+
+    public void setAlliance(String alliance) {
+        this.alliance = alliance;
     }
 }

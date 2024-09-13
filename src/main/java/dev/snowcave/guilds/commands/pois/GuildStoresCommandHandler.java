@@ -7,8 +7,8 @@ import dev.snowcave.guilds.interaction.GuildStoreListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -16,11 +16,10 @@ import java.util.List;
  */
 public class GuildStoresCommandHandler extends GuildMemberBonusCommandHandler {
 
-    private Inventory openInventory(Player player, int rows, String displayName) {
+    private void openInventory(Player player, int rows, String displayName) {
         Inventory inventory = Bukkit.createInventory(player, rows * 9, displayName);
         player.openInventory(inventory);
         GuildStoreListener.OPEN_STORES.add(player.getUniqueId());
-        return inventory;
     }
 
     @Override
@@ -35,11 +34,11 @@ public class GuildStoresCommandHandler extends GuildMemberBonusCommandHandler {
 
     @Override
     public List<String> getKeywords() {
-        return Arrays.asList("stores");
+        return List.of("stores");
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild stores &8- &7Deposit food in the guild stores.";
     }
 }

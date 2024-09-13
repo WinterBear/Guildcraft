@@ -1,7 +1,7 @@
 package dev.snowcave.guilds.commands.options;
 
 import dev.snowcave.guilds.core.Guild;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import dev.snowcave.guilds.utils.Chatter;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,13 +12,13 @@ public class PvpOptionHandler extends OnOffGuildOptionHandler {
     @Override
     public void enable(Guild guild, Player player) {
         guild.getGuildOptions().setPvpEnabled(true);
-        ChatUtils.send(player, "&7PvP is now &aenabled &7within the guild area. Only guild members may PvP.");
+        Chatter.sendP(player, "&7PvP is now &aenabled &7within the guild area. Only guild members may PvP.");
     }
 
     @Override
     public void disable(Guild guild, Player player) {
         guild.getGuildOptions().setPvpEnabled(false);
-        ChatUtils.send(player, "&7PvP is now &cdisabled &7within the guild area.");
+        Chatter.sendP(player, "&7PvP is now &cdisabled &7within the guild area.");
     }
 
     @Override
@@ -27,11 +27,11 @@ public class PvpOptionHandler extends OnOffGuildOptionHandler {
     }
 
     @Override
-    public void displayValue(Guild guild, Player player) {
+    public void handleNoArgs(Guild guild, Player player) {
         if (guild.getGuildOptions().isPvpEnabled()) {
-            ChatUtils.send(player, "&7PvP is &aenabled &7within the guild area. Only guild members may PvP.");
+            Chatter.sendP(player, "&7PvP is &aenabled &7within the guild area. Only guild members may PvP.");
         } else {
-            ChatUtils.send(player, "&7PvP is &cdisabled &7within the guild area.");
+            Chatter.sendP(player, "&7PvP is &cdisabled &7within the guild area.");
         }
     }
 }

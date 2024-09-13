@@ -5,9 +5,10 @@ import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.GuildBonus;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.ChunkUtils;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,9 +25,9 @@ public class GuildMoveSpawnCommandHandler extends GuildMemberPermissionBonusComm
         Guild userGuild = user.getGuild();
         if (chunkGuild.isPresent() && chunkGuild.get().equals(userGuild)) {
             userGuild.setSpawnLocation(player.getLocation());
-            ChatUtils.send(player, "&3Guild spawn was moved to your current location.");
+            Chatter.sendP(player, "Guild spawn was moved to your current location.");
         } else {
-            ChatUtils.send(player, "&cError &8- &7Location is not within guild territory.");
+            Chatter.error(player, "Location is not within guild territory.");
         }
 
     }
@@ -47,7 +48,7 @@ public class GuildMoveSpawnCommandHandler extends GuildMemberPermissionBonusComm
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild movespawn &8- &7Moves your Guild Spawn to your current location.";
     }
 }

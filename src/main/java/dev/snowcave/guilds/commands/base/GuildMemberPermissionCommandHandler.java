@@ -16,7 +16,7 @@ import java.util.Optional;
 public abstract class GuildMemberPermissionCommandHandler extends GuildMemberCommandHandler {
 
     public void handle(Player player, User user, String[] arguments) {
-        if (user.hasPermission(getPermission())) {
+        if (user.hasPermission(getPermission()) || user.hasPermission(GuildPermission.LEADER)) {
             handleWithPermission(player, user, arguments);
         } else {
             ChatUtils.send(player, "&7You do not have permission to use this command.");

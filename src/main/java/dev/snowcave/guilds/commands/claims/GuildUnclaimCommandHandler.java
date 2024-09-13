@@ -5,10 +5,11 @@ import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.ChunkUtils;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,20 +22,21 @@ public class GuildUnclaimCommandHandler extends GuildMemberPermissionCommandHand
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
+        Chatter chatter = new Chatter(player);
         Guild guild = user.getGuild();
         Chunk chunk = player.getLocation().getChunk();
         Optional<Guild> chunkOwner = ChunkUtils.getGuild(chunk);
         if (chunkOwner.isPresent()) {
             if (guild.allChunks().size() < 2) {
-                ChatUtils.send(player, ChatUtils.format("&7You cannot unclaim the last chunk in a guild."));
+                chatter.error("You cannot unclaim the last chunk in a guild.");
             } else if (chunkOwner.get().equals(guild)) {
                 guild.unclaimChunk(chunk);
-                ChatUtils.send(player, ChatUtils.format("&7Unclaimed chunk &b" + ChunkReference.toString(chunk)));
+                chatter.sendP("&7Unclaimed chunk &b" + ChunkReference.toString(chunk));
             } else {
-                ChatUtils.send(player, ChatUtils.format("&7Chunk is not owned by your guild."));
+                chatter.error("Chunk is not owned by your guild.");
             }
         } else {
-            ChatUtils.send(player, ChatUtils.format("&7Chunk is not part of a guilds territory."));
+            chatter.error("Chunk is not part of a guilds territory.");
         }
     }
 
@@ -49,7 +51,7 @@ public class GuildUnclaimCommandHandler extends GuildMemberPermissionCommandHand
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild unclaim &8- &7Unclaim a chunk from your Guilds territory.";
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import dev.snowcave.guilds.TestGuildCreator;
-import junit.framework.TestCase;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by WinterBear on 05/01/2021.
  */
-public class GuildToJSONTest extends TestCase {
+public class GuildToJSONTest {
 
     @Test
     public void test() throws JsonProcessingException {

@@ -1,14 +1,18 @@
 package dev.snowcave.guilds.commands.options;
 
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
+import dev.snowcave.guilds.commands.general.GuildSubcommandHandler;
 import dev.snowcave.guilds.core.Guild;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by WinterBear on 20/12/2020.
@@ -24,7 +28,7 @@ import java.util.List;
  */
 public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHandler {
 
-    private static final List<GuildOptionHandler> OPTION_HANDLERS = Arrays.asList(
+    private static final List<GuildSubcommandHandler> OPTION_HANDLERS = Arrays.asList(
             new TaxOptionHandler(),
             new ExplosionsOptionHandler(),
             new SymbolOptionHandler(),
@@ -34,7 +38,8 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
             new NoticeboardOptionHandler(),
             new TagOptionHandler(),
             new ColorOptionHandler(),
-            new RenameGuildOptionHandler());
+            new RenameGuildOptionHandler(),
+            new TraderOptionHandler());
 
     @Override
     public List<String> getKeywords() {
@@ -42,7 +47,7 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild options &8- &7View and edit options for your Guild";
     }
 
@@ -54,17 +59,25 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
         }
     }
 
+    private String onOff(String on, String off, boolean value) {
+        if (value) {
+            return on;
+        } else {
+            return off;
+        }
+    }
+
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
         Guild guild = user.getGuild();
         if ((arguments[0].equalsIgnoreCase("options") || arguments[0].equalsIgnoreCase("o"))) {
             if (arguments.length > 1) {
-                for (GuildOptionHandler handler : OPTION_HANDLERS) {
+                for (GuildSubcommandHandler handler : OPTION_HANDLERS) {
                     if (arguments[1].equalsIgnoreCase(handler.getKeyword())) {
                         if (arguments.length > 2) {
-                            handler.setValue(guild, player, String.join(" ", Arrays.copyOfRange(arguments, 2, arguments.length)));
+                            handler.handle(guild, player, String.join(" ", Arrays.copyOfRange(arguments, 2, arguments.length)));
                         } else {
-                            handler.displayValue(guild, player);
+                            handler.handleNoArgs(guild, player);
                         }
                         return;
                     }
@@ -80,12 +93,27 @@ public class GuildOptionsCommandHandler extends GuildMemberPermissionCommandHand
             ChatUtils.send(player, "&b/g options tag &e<&6tag&e> &8- &7Change the guild tag &8(&6" + guild.getGuildOptions().getGuildTag() + "&8)");
             ChatUtils.send(player, "&b/g options public &e<&aon&8/&coff&e> &8- &7Allow anyone to join your guild. &8(" + onOff(guild.getGuildOptions().isPublic()) + "&8)");
             ChatUtils.send(player, "&b/g options rename &e<&6new name&e> &8- &7Rename your Guild. &8(&6" + guild.getGuildName() + "&8)");
+            ChatUtils.send(player, "&b/g options traders &e<&aon&8/&coff&e> &8- &7Toggle Wandering Traders. &8(&6" + onOff("&aTraders Allowed", "&cTraders Banned", guild.getGuildOptions().isTradersBanned()) + "&8)");
         }
     }
 
     @Override
     public GuildPermission getPermission() {
         return GuildPermission.OPTIONS;
+    }
+
+    @Override
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        if (args.length == 2) {
+            return OPTION_HANDLERS.stream().map(GuildSubcommandHandler::getKeyword).collect(Collectors.toList());
+        } else if (args.length > 2) {
+            for (GuildSubcommandHandler handler : OPTION_HANDLERS) {
+                if (args[1].equalsIgnoreCase(handler.getKeyword())) {
+                    return handler.getTabCompletions(sender, args);
+                }
+            }
+        }
+        return List.of();
     }
 
     //Taxes - Requires Tax Editing Permission

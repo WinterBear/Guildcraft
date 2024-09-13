@@ -1,9 +1,14 @@
 package dev.snowcave.guilds.map;
 
+import dev.snowcave.guilds.Guilds;
 import dev.snowcave.guilds.core.ChunkReference;
 import dev.snowcave.guilds.core.ChunkStore;
 import dev.snowcave.guilds.core.Guild;
+import dev.snowcave.guilds.utils.Chatter;
+import dev.snowcave.guilds.utils.RepeatingTask;
+import dev.snowcave.guilds.utils.RepeatingTaskUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
 import xyz.jpenilla.squaremap.api.Point;
 import xyz.jpenilla.squaremap.api.*;
 import xyz.jpenilla.squaremap.api.marker.MarkerOptions;
@@ -25,20 +30,34 @@ public class MapRenderer {
 
     private static boolean mapEnabled = false;
 
-    private static SimpleLayerProvider layerProvider = null;
+    private static final HashMap<String, SimpleLayerProvider> LAYER_PROVIDERS = new HashMap<>();
 
-    private static xyz.jpenilla.squaremap.api.MapWorld mapWorld;
+    public static void enable(List<String> worlds, JavaPlugin plugin) {
+        RepeatingTaskUtils.everySeconds(30, new RepeatingTask("Guild Map Render Task", () -> renderWorlds(worlds)), plugin);
 
-    public static void enable() {
-        if (getServer().getPluginManager().getPlugin("squaremap") == null) {
-            return;
-        } else {
+    }
+
+    private static boolean renderWorlds(List<String> worlds){
+        if (getServer().getPluginManager().getPlugin("squaremap") != null) {
             mapEnabled = true;
-            layerProvider = getLayerProvider("guilds");
-            WorldIdentifier identifier = BukkitAdapter.worldIdentifier(Bukkit.getWorld("world"));
-            mapWorld = SquaremapProvider.get().getWorldIfEnabled(identifier).orElse(null);
-            mapWorld.layerRegistry().register(Key.of("guilds"), layerProvider);
+
+            for (String world : worlds){
+                try {
+                    WorldIdentifier identifier = BukkitAdapter.worldIdentifier(Objects.requireNonNull(Bukkit.getWorld(world)));
+                    MapWorld mapWorld = SquaremapProvider.get().getWorldIfEnabled(identifier).orElse(null);
+                    SimpleLayerProvider layerProvider = getLayerProvider("guilds");
+                    assert mapWorld != null;
+                    mapWorld.layerRegistry().register(Key.of("guilds"), layerProvider);
+                    LAYER_PROVIDERS.put(world, layerProvider);
+                    Guilds.GUILDS.forEach(g -> renderGuild(String.valueOf(g.hashCode()), g));
+                } catch (IllegalStateException exception) {
+                    Bukkit.getLogger().severe("Squaremap API Could not retrieve MapWorld for world " + world);
+                    return true;
+                }
+            }
         }
+        Bukkit.getLogger().info("Squaremap API rendering complete");
+        return false;
     }
 
     private static SimpleLayerProvider getLayerProvider(String label) {
@@ -51,44 +70,57 @@ public class MapRenderer {
     }
 
     public static void renderGuild(String markerKey, Guild guild) {
-        MultiPolygon multiPolygon = getPolygon(guild);
-        multiPolygon.markerOptions(getMarkerOptions(guild));
+        Chatter.infoConsole("Rendering Guild " + guild.getGuildName());
+        if (mapEnabled) {
+            for (String world : LAYER_PROVIDERS.keySet()){
+                MultiPolygon multiPolygon = getPolygon(guild, world);
+                multiPolygon.markerOptions(getMarkerOptions(guild));
+                LAYER_PROVIDERS.get(world).addMarker(Key.of(markerKey), multiPolygon);
+            }
 
-        layerProvider.addMarker(Key.of(markerKey), multiPolygon);
+        }
     }
 
-    private static MultiPolygon getPolygon(Guild guild) {
-
+    private static MultiPolygon getPolygon(Guild guild, String world) {
         ChunkStore mainChunks = guild.getChunks();
-        Collection<ChunkStore> outpostChunks = guild.getOutposts().values();
+        Collection<ChunkStore> outpostChunks = new ArrayList<>(guild.getOutposts().values());
 
-        List<MultiPolygon.MultiPolygonPart> parts = getPolygon(mainChunks);
-        outpostChunks.forEach(c -> parts.addAll(getPolygon(c)));
+        List<MultiPolygon.MultiPolygonPart> parts = getPolygon(mainChunks, world);
+        outpostChunks.stream()
+
+                .filter(p -> p.getChunkReferences().stream().allMatch(c -> c.getWorldRef().equals(world)))
+                .forEach(c -> parts.addAll(getPolygon(c, world)));
 
         return MultiPolygon.multiPolygon(parts);
-
-
     }
 
-    private static ChunkReference findRightMost(ChunkStore store) {
-        ChunkReference rightMostBlock = store.getChunkReferences().stream().findAny().get();
-        for (ChunkReference chunkReference : store.getChunkReferences()) {
-            if (chunkReference.getX() > rightMostBlock.getX()
-                    || (chunkReference.getX() == rightMostBlock.getX() && chunkReference.getZ() > rightMostBlock.getZ())) {
-                rightMostBlock = chunkReference;
+    private static ChunkReference findRightMost(ChunkStore store, String world) {
+        Optional<ChunkReference> optionalRightMostBlock = store.getChunkReferences().stream().findAny();
+        if(optionalRightMostBlock.isPresent()){
+            ChunkReference rightMostBlock = optionalRightMostBlock.get();
+            for (ChunkReference chunkReference : store.getChunkReferences()) {
+                if (chunkReference.getWorldRef().equalsIgnoreCase(world) && (chunkReference.getX() > rightMostBlock.getX()
+                        || (chunkReference.getX() == rightMostBlock.getX() && chunkReference.getZ() > rightMostBlock.getZ()))) {
+                    rightMostBlock = chunkReference;
+                }
             }
+            return rightMostBlock;
+        }
+        return null;
+    }
+
+    public static List<MultiPolygon.MultiPolygonPart> getPolygon(ChunkStore store, String world) {
+
+        if(store.getChunkReferences().isEmpty() || !store.getChunkReferences().stream().findFirst().get().getWorldRef().equals(world)){
+            return new ArrayList<>();
         }
 
-        return rightMostBlock;
-    }
-
-    public static List<MultiPolygon.MultiPolygonPart> getPolygon(ChunkStore store) {
-
-        ChunkReference rightMostBlock = findRightMost(store);
+        ChunkReference rightMostBlock = findRightMost(store, world);
 
         Set<Point> poly = new LinkedHashSet<>();
 
         // Origin point is the upper left of the chunk
+        assert rightMostBlock != null;
         Point originPoint = rightMostBlock.origin(CHUNKSCALE);
 
         Queue<ChunkReference> guildBlocksToVisit = new ArrayDeque<>(1);
@@ -112,7 +144,6 @@ public class MapRenderer {
                     else if (isOriginPoint)
                         isOriginPoint = false;
 
-                    long offsetHash;
                     // Check if there's a chunk above us
                     // Theoretically can only happen if we are going towards the origin, not away
                     // We have hit a corner!
@@ -120,7 +151,6 @@ public class MapRenderer {
                         guildBlocksToVisit.add(chunkRef.above());
                         direction = 3;
                         // Mark UL
-                        //printPoint("Upper Left: ", chunkRef.origin(CHUNKSCALE));
                         poly.add(chunkRef.origin(CHUNKSCALE));
                     }
                     // Check if there's a chunk to the right of us
@@ -133,13 +163,11 @@ public class MapRenderer {
                         direction = 1;
                         guildBlocksToVisit.add(chunkRef);
                         // Mark UR
-                        //printPoint("Upper Right: ", chunkRef.upperRight(CHUNKSCALE));
                         poly.add(chunkRef.upperRight(CHUNKSCALE));
                     }
                     break;
                 }
                 case 2: {
-                    long offsetHash;
                     // Check if there's a townblock below us (This happens at corners)
                     if (store.has(chunkRef.below())) {
                         // Queue the block below
@@ -147,7 +175,6 @@ public class MapRenderer {
                         // Set direction as down
                         direction = 1;
                         // Mark LR
-                        //printPoint("Lower Right: ",  chunkRef.lowerRight(CHUNKSCALE));
                         poly.add(chunkRef.lowerRight(CHUNKSCALE));
                     }
                     // Check if there's a townblock to the left of us
@@ -160,14 +187,12 @@ public class MapRenderer {
                         direction = 3;
                         guildBlocksToVisit.add(chunkRef);
                         // Mark LL
-                        //printPoint("Lower Left: ", chunkRef.lowerLeft(CHUNKSCALE));
                         poly.add(chunkRef.lowerLeft(CHUNKSCALE));
                     }
 
                     break;
                 }
                 case 1: {
-                    long offsetHash;
                     // Check if there's a townblock to the right us (We have hit a corner)
                     if (store.has(chunkRef.right())) {
                         // Queue the block right
@@ -175,7 +200,6 @@ public class MapRenderer {
                         // Set direction as right
                         direction = 0;
                         // Mark UR
-                        //printPoint("Upper Right: ", chunkRef.upperRight(CHUNKSCALE));
                         poly.add(chunkRef.upperRight(CHUNKSCALE));
                     }
                     // Check if there's a townblock below us
@@ -188,20 +212,17 @@ public class MapRenderer {
                         direction = 2;
                         guildBlocksToVisit.add(chunkRef);
                         // Mark LR
-                        //printPoint("Lower Right: ", chunkRef.lowerRight(CHUNKSCALE));
                         poly.add(chunkRef.lowerRight(CHUNKSCALE));
                     }
 
                     break;
                 }
                 case 3: {
-                    long offsetHash;
                     // Check if there's a townblock to the left of us (We have hit a corner)
                     if (store.has(chunkRef.left())) {
                         guildBlocksToVisit.add(chunkRef.left());
                         direction = 2;
                         // Mark LL
-                        //printPoint("Lower Left: ", chunkRef.lowerLeft(CHUNKSCALE));
                         poly.add(chunkRef.lowerLeft(CHUNKSCALE));
                     }
                     // Check if there's a townblock above us
@@ -214,7 +235,6 @@ public class MapRenderer {
                         direction = 0;
                         guildBlocksToVisit.add(chunkRef);
                         // Mark UL
-                        //printPoint("Upper Left: ", chunkRef.origin(CHUNKSCALE));
                         poly.add(chunkRef.origin(CHUNKSCALE));
                     }
 
@@ -223,32 +243,28 @@ public class MapRenderer {
             }
         }
 
-
-        //List<ChunkReference> negativeSpace todo
         List<MultiPolygon.MultiPolygonPart> parts = new ArrayList<>();
-
         parts.add(MultiPolygon.part(new ArrayList<>(poly), new ArrayList<>()));
         return parts;
 
     }
 
-    private static void printPoint(String prefix, Point p) {
-        System.out.println(prefix + p.x() + "," + p.z());
-    }
-
-
     private static MarkerOptions getMarkerOptions(Guild guild) {
         return MarkerOptions
                 .builder()
+
                 .clickTooltip(guild.getGuildName())
                 .hoverTooltip(guild.getGuildName())
+
                 .fill(true)
+                .fillColor(Color.decode(guild.getGuildOptions().getColor()))
                 .fillOpacity(0.2)
+
                 .stroke(true)
                 .strokeColor(Color.decode(guild.getGuildOptions().getColor()))
                 .strokeWeight(1)
                 .strokeOpacity(1.0)
-                .fillColor(Color.decode(guild.getGuildOptions().getColor()))
+
                 .build();
     }
 

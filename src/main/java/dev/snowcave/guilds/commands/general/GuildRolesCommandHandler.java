@@ -6,9 +6,12 @@ import dev.snowcave.guilds.core.users.Role;
 import dev.snowcave.guilds.core.users.RoleComparator;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.Chatter;
 import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +23,18 @@ import java.util.stream.Collectors;
  * Created by WinterBear on 28/12/2020.
  */
 public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandler {
+
+    //Tab completions
+    @Override
+    public List<String> getTabCompletions(CommandSender sender, String[] arguments) {
+        if (arguments.length == 2) {
+            return Arrays.asList("list", "create", "rename", "copy", "remove", "addperm", "removeperm", "permissions", "perms", "assign");
+            //TODO do this better
+        }
+        return Collections.emptyList();
+
+
+    }
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
@@ -125,7 +140,7 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild roles &8- &7Edit guild roles";
     }
 
@@ -138,6 +153,7 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
 
         for (Role role : orderedRoles) {
             List<String> users = user.getGuild().getMembers().stream()
+                    .filter(u -> u.getRole() != null)
                     .filter(u -> u.getRole().get().equals(role))
                     .map(User::getName)
                     .collect(Collectors.toList());
@@ -154,47 +170,55 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
     //Create new Role
 
     public void createRole(Player player, User user, String newRoleTitle) {
+        Chatter chatter = new Chatter(player);
         if (user.getGuild().getRole(newRoleTitle).isPresent()) {
-            ChatUtils.send(player, "&7There is already a role in your guild with that name.");
+            chatter.error("There is already a role in your guild with that name.");
             return;
         }
         Role newRole = new Role();
         newRole.setTitle(newRoleTitle);
         user.getGuild().getRoles().add(newRole);
-        ChatUtils.send(player, "&7Created new role " + newRoleTitle + " successfully.");
+        chatter.sendP("Created new role " + newRoleTitle + " successfully.");
     }
 
     //Copy permissions from one role to another
 
     public void copyPermissions(Player player, User user, String fromRoleReference, String toRoleReference) {
+        Chatter chatter = new Chatter(player);
         Optional<Role> fromRole = user.getGuild().getRole(fromRoleReference);
         Optional<Role> toRole = user.getGuild().getRole(toRoleReference);
-        if (!fromRole.isPresent()) {
-            ChatUtils.send(player, "&7Error. Source role " + fromRoleReference + " does not appear to exist.");
+        if (fromRole.isEmpty()) {
+            chatter.error("Source role " + fromRoleReference + " does not appear to exist.");
             return;
         }
-        if (!toRole.isPresent()) {
-            ChatUtils.send(player, "&7Error. Destination role " + toRoleReference + " does not appear to exist.");
+        if (toRole.isEmpty()) {
+            chatter.error("Destination role " + toRoleReference + " does not appear to exist.");
             return;
         }
-        fromRole.get().getPermissions().forEach(p -> toRole.get().getPermissions().add(p));
-        ChatUtils.send(player, "&7Copied all permissions from &b" + fromRole.get().getTitle() + " &7to &e" + toRole.get().getTitle());
+        fromRole.get().getPermissions().stream()
+                .filter(p -> p != GuildPermission.LEADER).forEach(p -> toRole.get().getPermissions().add(p));
+        chatter.sendP("Copied all permissions from &b" + fromRole.get().getTitle() + " &7to &e" + toRole.get().getTitle());
     }
 
     //Delete Role
 
     public void deleteRole(Player player, User user, String role) {
+        Chatter chatter = new Chatter(player);
         Optional<Role> deleteRole = user.getGuild().getRole(role);
         if (deleteRole.isPresent()) {
             if (getLowestRank(user.getGuild()).equals(deleteRole.get())) {
-                ChatUtils.send(player, "&cError. The default rank cannot be deleted, only renamed/edited.");
+                chatter.error("The default rank cannot be deleted, only renamed/edited.");
+                return;
+            }
+            if (deleteRole.get().getPermissions().contains(GuildPermission.LEADER)) {
+                chatter.error("The Guild Leader rank cannot be deleted or edited, only renamed.");
                 return;
             }
             user.getGuild().getMembers()
                     .stream().filter(u -> u.getRole().equals(deleteRole))
                     .forEach(this::deleteUserRole);
             user.getGuild().getRoles().remove(deleteRole.get());
-            ChatUtils.send(player, "&7Deleted role &c" + deleteRole.get().getTitle() + " &7and moved any members to &e" + getLowestRank(user.getGuild()).getTitle());
+            chatter.sendP("Deleted role &c" + deleteRole.get().getTitle() + " &7and moved any members to &e" + getLowestRank(user.getGuild()).getTitle());
         }
     }
 
@@ -206,87 +230,99 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
         return guild.getRoles()
                 .stream()
                 .sorted(new RoleComparator())
-                .collect(Collectors.toList())
+                .toList()
                 .get(0);
     }
 
     //Add Role Permission
 
     public void addRolePermission(Player player, User user, String roleName, String permission) {
+        Chatter chatter = new Chatter(player);
         Optional<GuildPermission> optionalPerm = GuildPermission.get(permission);
         Optional<Role> role = user.getGuild().getRole(roleName);
         if (optionalPerm.isPresent()) {
             if (role.isPresent()) {
                 if (role.get().getPermissions().contains(optionalPerm.get())) {
-                    ChatUtils.send(player, "&7That role already has the permission " + optionalPerm.get().getDisplayName());
+                    chatter.error("That role already has the permission " + optionalPerm.get().getDisplayName());
                     return;
                 }
                 role.get().addPermission(optionalPerm.get());
-                ChatUtils.send(player, "&7Added the permission " + optionalPerm.get().getDisplayName() + " to the role " + role.get().getTitle());
+                chatter.sendP("Added the permission " + optionalPerm.get().getDisplayName() + " to the role " + role.get().getTitle());
             } else {
-                ChatUtils.send(player, "&7The role " + roleName + " does not appear to exist.");
-                ChatUtils.send(player, "&7Available roles:");
-                user.getGuild().getRoles().forEach(r -> ChatUtils.send(player, "&6" + r.getTitle()));
+                chatter.error("The role " + roleName + " does not appear to exist.");
+                chatter.send("&7Available roles:");
+                user.getGuild().getRoles().forEach(r -> chatter.send( "&6" + r.getTitle()));
             }
         } else {
-            ChatUtils.send(player, "&7The permission " + permission + " does not exist.");
-            ChatUtils.send(player, "&7Available Permissions: ");
+            chatter.error("The permission " + permission + " does not exist.");
+            chatter.send("&7Available Permissions: ");
             Arrays.stream(GuildPermission.values()).forEach(p -> ChatUtils.send(player, "&6" + p.getDisplayName() + "&b: &3" + p.getDescription()));
         }
     }
 
     //Remove Role Permission
     public void removeRolePermission(Player player, User user, String roleName, String permission) {
+        Chatter chatter = new Chatter(player);
         Optional<GuildPermission> optionalPerm = GuildPermission.get(permission);
         Optional<Role> role = user.getGuild().getRole(roleName);
         if (optionalPerm.isPresent()) {
             if (role.isPresent()) {
+                if (role.get().getPermissions().contains(GuildPermission.LEADER)) {
+                    chatter.error("The Guild Leader rank's permissions cannot be modified, only renamed.");
+                    return;
+                }
                 if (!role.get().getPermissions().contains(optionalPerm.get())) {
-                    ChatUtils.send(player, "&7That role does not have the permission " + optionalPerm.get().getDisplayName());
+                    chatter.error("That role does not have the permission " + optionalPerm.get().getDisplayName());
                     return;
                 }
                 role.get().removePermission(optionalPerm.get());
-                ChatUtils.send(player, "&7Removed the permission " + optionalPerm.get().getDisplayName() + " from the role " + role.get().getTitle());
+                chatter.sendP("Removed the permission " + optionalPerm.get().getDisplayName() + " from the role " + role.get().getTitle());
             } else {
-                ChatUtils.send(player, "&7The role &b" + roleName + " &7does not appear to exist.");
-                ChatUtils.send(player, "&7Available roles&8:");
-                user.getGuild().getRoles().forEach(r -> ChatUtils.send(player, "&3" + r.getTitle()));
+                chatter.error("The role " + roleName + " does not appear to exist.");
+                chatter.send("&7Available roles&8:");
+                user.getGuild().getRoles().forEach(r -> chatter.send("&3" + r.getTitle()));
             }
         } else {
-            ChatUtils.send(player, "&7The permission &e" + permission + " &7does not exist.");
-            ChatUtils.send(player, "&7Available Permissions&8: ");
-            Arrays.stream(GuildPermission.values()).forEach(p -> ChatUtils.send(player, "&6" + p.getDisplayName() + "&b: &3" + p.getDescription()));
+            chatter.error("The permission " + permission + " does not exist.");
+            chatter.send("&7Available Permissions&8: ");
+            Arrays.stream(GuildPermission.values()).forEach(p -> chatter.send("&6" + p.getDisplayName() + "&b: &3" + p.getDescription()));
         }
     }
 
     //Change User Role
 
     public void changeRole(Player player, User user, String targetPlayerName, String roleName) {
+        Chatter chatter = new Chatter(player);
         Optional<Role> role = user.getGuild().getRole(roleName);
         Optional<User> target = user.getGuild().getMembers().stream().filter(u -> u.getName().equalsIgnoreCase(targetPlayerName)).findAny();
         if (target.isPresent()) {
             if (role.isPresent()) {
+                if (role.get().getPermissions().contains(GuildPermission.LEADER)) {
+                    chatter.error("The Guild Leader's rank cannot be modified, only renamed.");
+                    return;
+                }
                 target.get().setRole(role.get());
-                ChatUtils.send(player, "&7Player &b" + target.get().getName() + "&7 was granted the role of &6" + role.get().getTitle());
+                chatter.sendP( "&7Player &b" + target.get().getName() + "&7 was granted the role of &6" + role.get().getTitle());
                 Player targetPlayer = Bukkit.getPlayer(user.getUuid());
                 if (targetPlayer != null && targetPlayer.isOnline()) {
-                    ChatUtils.send(targetPlayer, "&7You were granted the role of &b" + role.get().getTitle() + " &7by &6" + player.getDisplayName());
+                    Chatter.sendP(targetPlayer, "You were granted the role of &b" + role.get().getTitle() + " &7by &6" + player.getDisplayName());
                 }
             } else {
-                ChatUtils.send(player, "&7The role &b" + roleName + " &7does not appear to exist.");
-                ChatUtils.send(player, "&7Available roles&8:");
+                chatter.error("The role " + roleName + " does not appear to exist.");
+                chatter.send("&7Available roles&8:");
                 user.getGuild().getRoles().forEach(r -> ChatUtils.send(player, "&3" + r.getTitle()));
             }
 
         } else {
-            ChatUtils.send(player, "&7The player &b" + targetPlayerName + " &7does not appear to be a member of your Guild.");
-            ChatUtils.send(player, "&7Members&8:");
-            user.getGuild().getMembers().forEach(m -> ChatUtils.send(player, "&3" + m.getName()));
+            chatter.error("The player " + targetPlayerName + " does not appear to be a member of your Guild.");
+            chatter.send("&7Members&8:");
+            user.getGuild().getMembers().forEach(m -> chatter.send("&3" + m.getName()));
         }
     }
 
     //Rename Role
     public void renameRole(Player player, User user, String roleName, String newName) {
+        Chatter chatter = new Chatter(player);
         Optional<Role> role = user.getGuild().getRole(roleName);
         if (role.isPresent()) {
             String oldName = role.get().getTitle();
@@ -294,11 +330,11 @@ public class GuildRolesCommandHandler extends GuildMemberPermissionCommandHandle
             user.getGuild().getMembers().stream()
                     .filter(m -> m.getRoleReference().equalsIgnoreCase(oldName))
                     .forEach(m -> m.setRoleReference(newName));
-            ChatUtils.send(player, "&7Renamed the role &6" + oldName + " &7to &e" + newName);
+            chatter.sendP("Renamed the role &6" + oldName + " &7to &e" + newName);
         } else {
-            ChatUtils.send(player, "&7The role &b" + roleName + " &7does not appear to exist.");
-            ChatUtils.send(player, "&7Available roles&8:");
-            user.getGuild().getRoles().forEach(r -> ChatUtils.send(player, "&6" + r.getTitle()));
+            chatter.error("The role &b" + roleName + " &7does not appear to exist.");
+            chatter.send("&7Available roles&8:");
+            user.getGuild().getRoles().forEach(r -> chatter.send("&6" + r.getTitle()));
         }
     }
 

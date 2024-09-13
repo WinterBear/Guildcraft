@@ -3,9 +3,10 @@ package dev.snowcave.guilds.commands.banking;
 import dev.snowcave.guilds.commands.base.GuildMemberPermissionCommandHandler;
 import dev.snowcave.guilds.core.users.User;
 import dev.snowcave.guilds.core.users.permissions.GuildPermission;
+import dev.snowcave.guilds.utils.Chatter;
 import dev.snowcave.guilds.utils.EconomyUtils;
-import io.github.winterbear.WinterCoreUtils.ChatUtils;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,21 +18,22 @@ public class GuildDepositCommandHandler extends GuildMemberPermissionCommandHand
 
     @Override
     public void handleWithPermission(Player player, User user, String[] arguments) {
+        Chatter chatter = new Chatter(player);
         if (arguments.length > 1) {
             try {
                 double amount = Double.parseDouble(arguments[1]);
                 if (EconomyUtils.ECONOMY.has(player, amount)) {
                     user.getGuild().deposit(amount);
                     EconomyUtils.ECONOMY.withdrawPlayer(player, amount);
-                    user.getGuild().broadcast("&b" + player.getName() + " &3deposited &6" + amount + " &3in the guild bank.");
+                    user.getGuild().broadcast("&b" + player.getName() + " &3deposited &6" + amount + " &3into the guild bank.");
                 } else {
-                    ChatUtils.send(player, "&7You do not have " + amount);
+                    chatter.error("You do not have " + amount + "s");
                 }
             } catch (NumberFormatException numberFormatException) {
-                ChatUtils.send(player, "&cError &8- &7Amount must be a number.");
+                chatter.error( "Amount must be a number.");
             }
         } else {
-            ChatUtils.send(player, "&b/guild deposit &e<&6amount&e> &8- &7Deposit money in your Guild bank.");
+            chatter.send( "&7Usage&8: &b/guild deposit &e<&6amount&e> &8- &7Deposit money in your Guild bank.");
         }
     }
 
@@ -46,7 +48,7 @@ public class GuildDepositCommandHandler extends GuildMemberPermissionCommandHand
     }
 
     @Override
-    public String describe() {
+    public @NotNull String describe() {
         return "&b/guild deposit &e<&6Amount&e> &8- &7Deposit money in your Guild bank.";
     }
 }
